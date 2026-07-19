@@ -1,7 +1,7 @@
 {
   "name": "Bärflix",
   "short_name": "Bärflix",
-  "description": "Private Kinder-Medien-App mit Serien, Favoriten, Chip-System und Elternbereich.",
+  "description": "Private Familien-Streaming-App mit Profilen, Serien, Favoriten und Chip-System.",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",

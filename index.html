@@ -78,8 +78,8 @@ input,select,textarea{width:100%;border:1px solid var(--line);border-radius:13px
 <div id="app"></div>
 <script>
 (()=>{"use strict";
-const APP_VERSION="3.0.0";
-const KEY="baerflix.complete.v3";
+const APP_VERSION="4.0.0";
+const KEY="baerflix.complete.v4";
 const $=(s,r=document)=>r.querySelector(s);
 const esc=s=>String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[m]));
 const uid=()=>crypto.randomUUID?crypto.randomUUID():Date.now()+"-"+Math.random();
@@ -88,8 +88,8 @@ const isWeekend=()=>[0,6].includes(new Date().getDay());
 const fmt=s=>`${String(Math.floor(Math.max(0,s)/60)).padStart(2,"0")}:${String(Math.floor(Math.max(0,s)%60)).padStart(2,"0")}`;
 const defaults={
   version:APP_VERSION,
-  settings:{pinHash:"",pinSalt:"",categories:["Serien","Fahrzeuge","Tiere","Musik","Einschlafen"],updateVersion:APP_VERSION},
-  kids:[],collections:[],favorites:{},history:[],chips:{},usage:[]
+  settings:{pinHash:"",pinSalt:"",categories:["Für Ludwig","Serien","Fahrzeuge","Wissen & Technik","Tiere","Musik","Gute Nacht"],updateVersion:APP_VERSION},
+  kids:[],collections:[{"id":"col-blaze","title":"Blaze und die Monster-Maschinen","category":"Fahrzeuge","coverId":"97AiQrxpca4","audience":["ludwig"],"episodes":[{"id":"blaze-1","youtubeId":"uPjeikJPATo","title":"Blaze stellt die Naschzeug-Diebin","order":0},{"id":"blaze-2","youtubeId":"ePqD4j_3nj4","title":"Die Recycling-Kraft","order":1},{"id":"blaze-3","youtubeId":"uJZvFsPkcOI","title":"Die Power-Reifen","order":2},{"id":"blaze-4","youtubeId":"t3Ma4ucdK7s","title":"Ninja Blaze","order":3},{"id":"blaze-5","youtubeId":"AvbtG7JhFH4","title":"Blazes fantastische Geschichten","order":4},{"id":"blaze-6","youtubeId":"iIAKh5vyyW4","title":"Blazes Weltraumabenteuer","order":5},{"id":"blaze-7","youtubeId":"ilzaZ7znCL8","title":"Das Dschungelhorn","order":6},{"id":"blaze-8","youtubeId":"bh32Yc5xMuI","title":"Die Backkatastrophe","order":7}]},{"id":"col-tautropfen","title":"Die Tautropfentagebücher","category":"Serien","coverId":"3W8JYqi-HgQ","audience":["ludwig"],"episodes":[{"id":"tau-1","youtubeId":"B23wSpAmWHo","title":"Das große Seifenblasenproblem","order":0},{"id":"tau-2","youtubeId":"TRdg_1vcqs4","title":"Briefabenteuer – eine besondere Lieferung","order":1},{"id":"tau-3","youtubeId":"C5zu9tRD7N8","title":"Sparschweinchenprobleme","order":2},{"id":"tau-4","youtubeId":"caVwaWK-xLo","title":"Die Feen bringen einen Hund zum Park","order":3},{"id":"tau-5","youtubeId":"Qme-9f8eXq8","title":"Die Tautropfen retten Harpers Fußballspiel","order":4},{"id":"tau-6","youtubeId":"77xV2Bn_cbU","title":"Ein Handy benutzen, das größer ist als du","order":5},{"id":"tau-7","youtubeId":"Z0pN9zu7qag","title":"Unternehmen Zahnfee","order":6},{"id":"tau-8","youtubeId":"4Saw_KbPcvg","title":"Die Feen entdecken eine neue Art zu fliegen","order":7}]},{"id":"col-fixies","title":"Die Fixies","category":"Wissen & Technik","coverId":"9bjc7fvP_wI","audience":["ludwig"],"episodes":[{"id":"fix-1","youtubeId":"9bjc7fvP_wI","title":"Das Fixiefon","order":0},{"id":"fix-2","youtubeId":"wQu_9ZJ7yVw","title":"Tom Thomas entdeckt die Kraft der Sonne","order":1},{"id":"fix-3","youtubeId":"uV89n_-DtY0","title":"Tom wird in einem Computervirus gefangen","order":2},{"id":"fix-4","youtubeId":"keBiLP_v-WY","title":"Unsichtbare Tinte","order":3},{"id":"fix-5","youtubeId":"U8qKFDUOH3U","title":"Seine Hose ist kaputt","order":4},{"id":"fix-6","youtubeId":"lR_U1KID1K4","title":"Die schwebenden Zauberbücher","order":5},{"id":"fix-7","youtubeId":"0qJ9rHL9aIQ","title":"Staffel 3 – komplette Sammlung","order":6},{"id":"fix-8","youtubeId":"HWJnkFYdi5c","title":"Staffel 2 – komplette Sammlung","order":7}]},{"id":"col-hotwheels","title":"Hot Wheels Let's Race","category":"Fahrzeuge","coverId":"KNYlz2JZgkw","audience":["ludwig"],"episodes":[{"id":"hot-1","youtubeId":"uCsARCroJiI","title":"Außer Kontrolle","order":0},{"id":"hot-2","youtubeId":"3VpwxF2dn9I","title":"Drachen-Showdown: Gemeinsam zum Sieg","order":1},{"id":"hot-3","youtubeId":"wcoJPLIAks0","title":"Ultimative Garagenübernahme","order":2},{"id":"hot-4","youtubeId":"8H3ex9pOlD8","title":"Ballonrettung: Coops große Rettung","order":3},{"id":"hot-5","youtubeId":"KNYlz2JZgkw","title":"Das Rennen um 500 Pizzen","order":4},{"id":"hot-6","youtubeId":"rbzK9OI3oAA","title":"Titelsong zum Mitsingen","order":5}]}],favorites:{},history:[],chips:{},usage:[]
 };
 let state=load(),screen=state.kids.length?"profiles":"setup",selectedKid=null,allowance=null,activeCategory="Alle",activeCollection=null,searchText="",modal=null,player=null,toastTimer=null;
 window.adminTab="overview";
@@ -99,7 +99,8 @@ function migrate(raw){
   s.settings=Object.assign({},defaults.settings,raw?.settings||{});
   s.settings.categories=s.settings.categories||raw?.categories||defaults.settings.categories;
   s.kids=(s.kids||[]).map(k=>Object.assign({weekdayMinutes:12,weekendMinutes:15,color:"#f3c85b",avatar:"🐻"},k));
-  s.collections=s.collections||[];
+  s.collections=(s.collections&&s.collections.length?s.collections:structuredClone(defaults.collections));
+  s.collections=s.collections.map(c=>Object.assign({audience:["all"]},c));
   s.favorites=s.favorites||{};
   s.history=s.history||[];
   s.chips=s.chips||{};
@@ -146,11 +147,11 @@ function setupView(){
   return `<div class="setup">${hero("Willkommen bei Bärflix","Lege Eltern-PIN und erstes Kinderprofil an.","🐻🍿")}
   <div class="panel" style="margin-top:18px"><div class="formGrid">
   <label>Eltern-PIN<input id="setupPin" type="password" inputmode="numeric" placeholder="mindestens 4 Ziffern"></label>
-  <label>Name des Kindes<input id="setupName" placeholder="z. B. Ludwig"></label>
+  <label>Name des Kindes<input id="setupName" value="Ludwig" placeholder="z. B. Ludwig"></label>
   <label>Avatar<select id="setupAvatar"><option>🐻</option><option>🦊</option><option>🐼</option><option>🦁</option><option>🐯</option><option>🐨</option><option>🐶</option><option>🦖</option></select></label>
   <label>Profilfarbe<input id="setupColor" type="color" value="#f3c85b"></label>
   <label>Minuten werktags<input id="setupWeekday" type="number" min="1" value="12"></label>
-  <label>Minuten am Wochenende<input id="setupWeekend" type="number" min="1" value="15"></label></div>
+  <label>Minuten am Wochenende<input id="setupWeekend" type="number" min="1" value="15"></label><label style="display:flex;grid-template-columns:auto 1fr;align-items:center;gap:10px"><input id="setupFabian" type="checkbox" checked style="width:auto"> Zusätzlich ein leeres Profil für Fabian anlegen</label></div>
   <div class="actions"><button class="btn primary" data-act="setupSave">Bärflix starten</button></div></div></div>`
 }
 function profilesView(){
@@ -166,27 +167,28 @@ function chipsView(){
   <div class="chipGrid">${chip("one1","⭐ Eine Folge",m,"one")}${chip("one2","⭐ Eine Folge",m,"one")}${chip("two","⭐⭐ Zwei Folgen",m*2,"two")}
   <button class="chip bonus" data-chip="bonus" data-min="${m}" ${c.bonus<1?"disabled":""}><b>🌈 Bonuschip</b><span>${c.bonus} verfügbar · ${m} Minuten</span></button></div>`
 }
-function allEpisodes(){return state.collections.flatMap(c=>c.episodes.map(e=>Object.assign({collectionId:c.id,collectionTitle:c.title,category:c.category},e)))}
+function visibleCollections(){return state.collections.filter(c=>!selectedKid||!c.audience||c.audience.includes("all")||c.audience.includes(selectedKid.id))}
+function allEpisodes(){return visibleCollections().flatMap(c=>c.episodes.map(e=>Object.assign({collectionId:c.id,collectionTitle:c.title,category:c.category},e)))}
 function filteredEpisodes(){
   const q=searchText.trim().toLowerCase();
   return allEpisodes().filter(e=>(activeCategory==="Alle"||e.category===activeCategory)&&(!q||e.title.toLowerCase().includes(q)||e.collectionTitle.toLowerCase().includes(q)))
 }
 function libraryView(){
-  const cats=["Alle",...categories()],cols=state.collections.filter(c=>(activeCategory==="Alle"||c.category===activeCategory)&&(!searchText||c.title.toLowerCase().includes(searchText.toLowerCase())||c.episodes.some(e=>e.title.toLowerCase().includes(searchText.toLowerCase()))));
+  const cats=["Alle",...categories()],cols=visibleCollections().filter(c=>(activeCategory==="Alle"||c.category===activeCategory)&&(!searchText||c.title.toLowerCase().includes(searchText.toLowerCase())||c.episodes.some(e=>e.title.toLowerCase().includes(searchText.toLowerCase()))));
   const favIds=state.favorites[selectedKid.id]||[],favEpisodes=allEpisodes().filter(e=>favIds.includes(e.id));
   const recent=state.history.filter(h=>h.kidId===selectedKid.id).slice(0,10).map(h=>allEpisodes().find(e=>e.id===h.episodeId)).filter(Boolean);
   return `<button class="btn ghost" data-act="chips">← Chips</button>
-  <div class="sectionHead"><div><h2>Was möchtest du schauen?</h2><p>${esc(selectedKid.name)} · ${fmt(allowance.remaining)} verfügbar</p></div><button class="btn mint" data-act="random">🎲 Überrasch mich</button></div>
+  <div class="sectionHead"><div><h2>Was möchtest du heute schauen?</h2><p>${esc(selectedKid.name)} · ${fmt(allowance.remaining)} verfügbar</p></div><button class="btn mint" data-act="random">🎲 Überrasch mich</button></div>
   <div class="searchbar"><input id="searchInput" value="${esc(searchText)}" placeholder="Serien oder Folgen suchen"><button class="btn" data-act="search">Suchen</button><button class="btn ghost" data-act="clearSearch">Leeren</button></div>
   <div class="categoryRow">${cats.map(c=>`<button class="pill ${activeCategory===c?"active":""}" data-category="${esc(c)}">${esc(c)}</button>`).join("")}</div>
   ${recent.length?shelfEpisodes("Zuletzt geschaut",recent):""}${favEpisodes.length?shelfEpisodes("Favoriten",favEpisodes):""}
-  <div class="shelf"><div class="shelfTitle"><h3>Serien & Sammlungen</h3></div>${cols.length?`<div class="carousel">${cols.map(collectionCard).join("")}</div>`:'<div class="empty">Noch keine passenden Inhalte vorhanden.</div>'}</div>`
+  <div class="shelf"><div class="shelfTitle"><h3>Für dich ausgewählt</h3></div>${cols.length?`<div class="carousel">${cols.map(collectionCard).join("")}</div>`:'<div class="empty">Für dieses Profil sind noch keine Serien freigegeben. Im Elternbereich kannst du Inhalte hinzufügen oder sichtbar machen.</div>'}</div>`
 }
 function collectionCard(c){const cover=c.coverId||c.episodes[0]?.youtubeId||"";return `<article class="collectionCard"><img class="cover" src="${cover?thumb(cover):""}" alt=""><span class="badge">${esc(c.category)}</span><div class="cardBody"><h3>${esc(c.title)}</h3><p>${c.episodes.length} Folge${c.episodes.length===1?"":"n"}</p></div><button class="overlayBtn" data-collection="${c.id}"></button></article>`}
 function shelfEpisodes(title,eps){return `<div class="shelf"><div class="shelfTitle"><h3>${esc(title)}</h3></div><div class="carousel">${eps.map(episodeCard).join("")}</div></div>`}
 function episodeCard(e){const fav=(state.favorites[selectedKid.id]||[]).includes(e.id);return `<article class="episodeCard"><img class="cover" src="${thumb(e.youtubeId)}" alt=""><button class="btn icon favoriteBtn ${fav?"active":""}" data-fav="${e.id}">${fav?"★":"☆"}</button><div class="cardBody"><h4>${esc(e.title)}</h4><p>${esc(e.collectionTitle||"")}</p></div><button class="overlayBtn" data-play="${e.id}"></button></article>`}
 function collectionView(){
-  const c=state.collections.find(x=>x.id===activeCollection);if(!c){screen="library";return libraryView()}
+  const c=visibleCollections().find(x=>x.id===activeCollection);if(!c){screen="library";return libraryView()}
   const eps=c.episodes.map(e=>Object.assign({collectionTitle:c.title},e));
   return `<div class="breadcrumb"><button class="btn ghost" data-act="library">← Mediathek</button><span class="muted">${esc(c.category)}</span></div>${hero(c.title,`${c.episodes.length} Folge${c.episodes.length===1?"":"n"}`,"🎬")}
   <div class="sectionHead"><div><h2>Folgen</h2><p>Tippen und anschauen</p></div></div><div class="episodeGrid">${eps.length?eps.map(episodeCard).join(""):'<div class="empty">Noch keine Folgen vorhanden.</div>'}</div>`
@@ -202,7 +204,7 @@ function adminView(){
 }
 function adminTabView(tab){
   if(tab==="overview")return `<div class="adminGrid"><section class="panel"><h3>📺 Inhalte</h3><p class="muted">${state.collections.length} Sammlungen · ${allEpisodes().length} Folgen</p></section><section class="panel"><h3>👧 Profile</h3><p class="muted">${state.kids.length} Kinderprofile</p></section><section class="panel"><h3>⏱️ Nutzung</h3><p class="muted">${Math.round(state.usage.reduce((a,u)=>a+u.seconds,0)/60)} Minuten insgesamt</p></section></div>`;
-  if(tab==="collections")return `<div class="formGrid"><label>Titel<input id="colTitle" placeholder="z. B. Feuerwehr Sam"></label><label>Kategorie<select id="colCat">${categories().map(c=>`<option>${esc(c)}</option>`).join("")}</select></label><label>Optionales Vorschaubild: YouTube-Link<input id="colCover" placeholder="leer = erste Folge"></label></div><div class="actions"><button class="btn primary" data-act="addCollection">Sammlung anlegen</button></div>
+  if(tab==="collections")return `<div class="formGrid"><label>Titel<input id="colTitle" placeholder="z. B. Feuerwehr Sam"></label><label>Kategorie<select id="colCat">${categories().map(c=>`<option>${esc(c)}</option>`).join("")}</select></label><label>Optionales Vorschaubild: YouTube-Link<input id="colCover" placeholder="leer = erste Folge"></label><label>Sichtbar für<select id="colAudience"><option value="all">Alle Kinder</option>${state.kids.map(k=>`<option value="${k.id}">${esc(k.name)}</option>`).join("")}</select></label></div><div class="actions"><button class="btn primary" data-act="addCollection">Sammlung anlegen</button></div>
   <div class="list" style="margin-top:18px">${state.collections.map(c=>`<div class="listItem"><span><b>${esc(c.title)}</b><br><small>${esc(c.category)} · ${c.episodes.length} Folgen</small></span><span><button class="btn" data-editcol="${c.id}">Bearbeiten</button> <button class="btn danger" data-delcol="${c.id}">Löschen</button></span></div>`).join("")||'<div class="empty">Noch keine Sammlungen.</div>'}</div>`;
   if(tab==="episodes")return `<div class="form"><label>Sammlung<select id="epCollection">${state.collections.map(c=>`<option value="${c.id}">${esc(c.title)}</option>`).join("")}</select></label><label>YouTube-Link<input id="epUrl" placeholder="https://youtu.be/..."></label><label>Titel<input id="epTitle" placeholder="Titel der Folge"></label></div><div class="actions"><button class="btn primary" data-act="fetchTitle">Titel automatisch holen</button><button class="btn mint" data-act="addEpisode">Folge hinzufügen</button></div>
   <div class="list" style="margin-top:18px">${state.collections.flatMap(c=>c.episodes.map(e=>`<div class="listItem"><span><b>${esc(e.title)}</b><br><small>${esc(c.title)}</small></span><span><button class="btn" data-editep="${e.id}">Bearbeiten</button> <button class="btn danger" data-delep="${e.id}">Löschen</button></span></div>`)).join("")||'<div class="empty">Noch keine Folgen.</div>'}</div>`;
@@ -239,7 +241,7 @@ function bind(){
   const f=$("#importFile");if(f)f.onchange=importBackup
 }
 async function act(a){
-  if(a==="setupSave"){const pin=$("#setupPin").value,name=$("#setupName").value.trim();if(pin.length<4)return showToast("PIN mindestens vier Ziffern");if(!name)return showToast("Bitte einen Namen eingeben");const h=await hashPin(pin);state.settings.pinHash=h.hash;state.settings.pinSalt=h.salt;state.kids.push({id:uid(),name,avatar:$("#setupAvatar").value,color:$("#setupColor").value,weekdayMinutes:+$("#setupWeekday").value||12,weekendMinutes:+$("#setupWeekend").value||15});save();screen="profiles";render()}
+  if(a==="setupSave"){const pin=$("#setupPin").value,name=$("#setupName").value.trim();if(pin.length<4)return showToast("PIN mindestens vier Ziffern");if(!name)return showToast("Bitte einen Namen eingeben");const h=await hashPin(pin);state.settings.pinHash=h.hash;state.settings.pinSalt=h.salt;state.kids.push({id:"ludwig",name,avatar:$("#setupAvatar").value,color:$("#setupColor").value,weekdayMinutes:+$("#setupWeekday").value||12,weekendMinutes:+$("#setupWeekend").value||15});if($("#setupFabian")?.checked)state.kids.push({id:"fabian",name:"Fabian",avatar:"🦊",color:"#8fc39a",weekdayMinutes:10,weekendMinutes:12});save();screen="profiles";render()}
   if(a==="login"){modal="login";render()}
   if(a==="closeModal"){modal=null;render()}
   if(a==="unlock"){const pin=$("#loginPin").value,h=await hashPin(pin,state.settings.pinSalt);if(h.hash===state.settings.pinHash){modal="admin";window.adminTab="overview";render()}else showToast("PIN nicht korrekt")}
@@ -249,7 +251,7 @@ async function act(a){
   if(a==="search"){searchText=$("#searchInput").value;render()}
   if(a==="clearSearch"){searchText="";render()}
   if(a==="random"){const eps=filteredEpisodes();if(!eps.length)return showToast("Keine passenden Folgen vorhanden");startPlayer(eps[Math.floor(Math.random()*eps.length)].id)}
-  if(a==="addCollection"){const title=$("#colTitle").value.trim(),category=$("#colCat").value,coverId=getVideoId($("#colCover").value);if(!title)return showToast("Bitte Titel eingeben");mutate(s=>s.collections.push({id:uid(),title,category,coverId,episodes:[]}));showToast("Sammlung angelegt")}
+  if(a==="addCollection"){const title=$("#colTitle").value.trim(),category=$("#colCat").value,coverId=getVideoId($("#colCover").value);if(!title)return showToast("Bitte Titel eingeben");const audience=$("#colAudience")?.value||"all";mutate(s=>s.collections.push({id:uid(),title,category,coverId,audience:[audience],episodes:[]}));showToast("Sammlung angelegt")}
   if(a==="fetchTitle")fetchTitle()
   if(a==="addEpisode")addEpisode()
   if(a==="addKid"){const name=$("#kidName").value.trim();if(!name)return showToast("Bitte Namen eingeben");mutate(s=>s.kids.push({id:uid(),name,avatar:$("#kidAvatar").value,color:$("#kidColor").value,weekdayMinutes:+$("#kidWeekday").value||12,weekendMinutes:+$("#kidWeekend").value||15}));showToast("Profil hinzugefügt")}
