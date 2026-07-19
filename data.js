@@ -1,4 +1,4 @@
-export const VERSION = "1.2.2";
+export const VERSION = "1.3.1";
 
 export const DEFAULT_SERIES = [
   {

@@ -1,4 +1,4 @@
-const CACHE = "baerenhaus-paw-rubble-v122";
+const CACHE = "baerenhaus-premium-v131";
 const STATIC = [
   "./",
   "./index.html",
