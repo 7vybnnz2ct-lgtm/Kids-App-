@@ -1,13 +1,13 @@
 {
   "name": "Bärflix",
   "short_name": "Bärflix",
-  "description": "Private Kinder-Medien-App mit freigegebenen YouTube-Videos und Chip-System.",
+  "description": "Private Kinder-Medien-App mit Serien, Favoriten, Chip-System und Elternbereich.",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
   "orientation": "any",
-  "background_color": "#211914",
-  "theme_color": "#211914",
+  "background_color": "#1c1512",
+  "theme_color": "#1c1512",
   "icons": [
     {
       "src": "./icons/icon.svg",
