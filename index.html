@@ -381,7 +381,7 @@ body.theme-castle .tree,body.theme-dino .tree{opacity:.5}
 <div id="app"></div>
 <script>
 (()=>{"use strict";
-const APP_VERSION="8.0.0";
+const APP_VERSION="8.0.1";
 const KEY="baerflix.complete.v8";
 const LEGACY_KEYS=["baerflix.complete.v7","baerflix.complete.v6"];
 const $=(s,r=document)=>r.querySelector(s);
@@ -404,7 +404,12 @@ function migrate(raw){
   s.settings.categories=s.settings.categories||raw?.categories||defaults.settings.categories;
   s.kids=(s.kids||[]).map(k=>Object.assign({weekdayMinutes:12,weekendMinutes:15,color:"#f3c85b",avatar:"🐻"},k));
   s.collections=(s.collections&&s.collections.length?s.collections:structuredClone(defaults.collections));
-  s.collections=s.collections.map(c=>Object.assign({audience:["all"],type:"series",active:true},c));
+  s.collections=(Array.isArray(s.collections)?s.collections:[]).map(c=>{
+    const safe=Object.assign({audience:["all"],type:"series",active:true,episodes:[]},c||{});
+    safe.episodes=Array.isArray(safe.episodes)?safe.episodes:[];
+    safe.audience=Array.isArray(safe.audience)?safe.audience:["all"];
+    return safe
+  });
   s.favorites=s.favorites||{};
   s.history=s.history||[];
   s.chips=s.chips||{};
@@ -415,6 +420,7 @@ function migrate(raw){
   if(!s.kids.some(k=>k.id==="ludwig"))s.kids.unshift({id:"ludwig",name:"Ludwig",avatar:"🐻",color:"#f3c85b",weekdayMinutes:12,weekendMinutes:15});
   if(!s.kids.some(k=>k.id==="fabian"))s.kids.push({id:"fabian",name:"Fabian",avatar:"🦊",color:"#8fc39a",weekdayMinutes:10,weekendMinutes:12});
   s.collections.forEach(c=>{if(c.audience?.includes("ludwig")&&!c.audience.includes("fabian"))c.audience.push("fabian")});
+  s.settings.updateVersion=APP_VERSION;
   s.version=APP_VERSION;
   return s
 }
@@ -482,10 +488,8 @@ async function hashPin(pin,saltB64){
   return{hash:btoa(String.fromCharCode(...new Uint8Array(bits))),salt:btoa(String.fromCharCode(...salt))}
 }
 function showToast(t){clearTimeout(toastTimer);let el=$("#toast");if(!el){el=document.createElement("div");el.id="toast";el.className="toast";document.body.appendChild(el)}el.textContent=t;toastTimer=setTimeout(()=>el.remove(),2600)}
-function shell(content){
-  const update=state.settings.updateVersion!==APP_VERSION?`<div class="updateBanner"><span>Eine neue Bärflix-Version ist verfügbar.</span><button class="btn" data-act="reload">Neu laden</button></div>`:"";
-  return `<div class="app"><div class="wrap">${update}<header class="topbar"><div class="brand"><div class="logo">🐻</div><div><h1>Bärflix</h1></div></div>${screen!=="setup"?'<button class="btn ghost" data-act="login" aria-label="Elternbereich">🔒</button>':""}</header><main>${content}</main></div></div>`
-}
+function worldView(){return `<div class="world"><div class="worldSky"></div><div class="worldSun"></div><div class="worldCloud c1"></div><div class="worldCloud c2"></div><div class="worldCloud c3"></div><div class="hill h1"></div><div class="hill h2"></div><div class="hill h3"></div><div class="tree treeLeft"></div><div class="tree treeRight"></div>${state.settings.particles!==false?'<div class="butterfly b1">🦋</div><div class="butterfly b2">🐦</div><div class="sparkleDot sd1"></div><div class="sparkleDot sd2"></div><div class="sparkleDot sd3"></div>':""}</div>`}
+function shell(content){applyTheme();return `${worldView()}<div class="app"><header class="topbar"><div class="brand"><div class="brandMark"><svg viewBox="0 0 120 120" aria-hidden="true"><defs><linearGradient id="fur" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#c98b55"/><stop offset="1" stop-color="#9d6038"/></linearGradient></defs><circle cx="28" cy="27" r="19" fill="#9d6038"/><circle cx="92" cy="27" r="19" fill="#9d6038"/><circle cx="60" cy="62" r="47" fill="url(#fur)"/><ellipse cx="60" cy="72" rx="28" ry="24" fill="#f1c99d"/><circle cx="43" cy="55" r="5" fill="#263944"/><circle cx="77" cy="55" r="5" fill="#263944"/><ellipse cx="60" cy="69" rx="8" ry="6" fill="#3c2b25"/><path d="M60 75c-7 9-16 7-19 3m19-3c7 9 16 7 19 3" fill="none" stroke="#3c2b25" stroke-width="4" stroke-linecap="round"/><circle cx="39" cy="67" r="5" fill="#e8918e" opacity=".75"/><circle cx="81" cy="67" r="5" fill="#e8918e" opacity=".75"/></svg></div><div><h1 class="brandWord">Bärflix<span class="dot">●</span></h1></div></div>${screen!=="setup"?'<button class="btn ghost" data-act="login" aria-label="Elternbereich">🔒</button>':""}</header><main>${content}</main><div class="mascotCorner">${isNight()?"🐻💤":"🐻"}</div><div id="toast" class="toast"></div></div>`}
 function hero(title,text,emoji){return `<section class="hero"><div><h2>${esc(title)}</h2><p>${esc(text)}</p></div><div class="heroEmoji">${emoji}</div></section>`}
 
 
@@ -494,7 +498,7 @@ function kidHistory(kidId){return state.history.filter(h=>h.kidId===kidId)}
 function playCountForEpisode(id){return selectedKid?kidHistory(selectedKid.id).filter(h=>h.episodeId===id).length:0}
 function collectionScore(c){
   if(!selectedKid)return 0;
-  const ids=new Set(c.episodes.map(e=>e.id));let score=0;
+  const ids=new Set((Array.isArray(c?.episodes)?c.episodes:[]).map(e=>e.id));let score=0;
   state.history.forEach(h=>{if(h.kidId===selectedKid.id&&ids.has(h.episodeId))score+=3});
   (state.favorites[selectedKid.id]||[]).forEach(id=>{if(ids.has(id))score+=5});
   return score
@@ -593,7 +597,7 @@ function chipsView(){
   </div>`
 }
 function visibleCollections(){return state.collections.filter(c=>c.active!==false&&(!selectedKid||!c.audience||c.audience.includes("all")||c.audience.includes(selectedKid.id))&&(mediaMode==="all"||c.type===mediaMode))}
-function allEpisodes(){return visibleCollections().flatMap(c=>c.episodes.map(e=>Object.assign({collectionId:c.id,collectionTitle:c.title,category:c.category},e)))}
+function allEpisodes(){return visibleCollections().flatMap(c=>(Array.isArray(c.episodes)?c.episodes:[]).map(e=>Object.assign({collectionId:c.id,collectionTitle:c.title,category:c.category},e)))}
 function filteredEpisodes(){
   const q=searchText.trim().toLowerCase();
   return allEpisodes().filter(e=>(activeCategory==="Alle"||e.category===activeCategory)&&(!q||e.title.toLowerCase().includes(q)||e.collectionTitle.toLowerCase().includes(q)))
@@ -691,7 +695,18 @@ function playerView(){const e=allEpisodes().find(x=>x.id===player.episodeId);ret
 function bind(){
   document.querySelectorAll("[data-act]").forEach(b=>b.onclick=()=>act(b.dataset.act));
   document.querySelectorAll("[data-kid]").forEach(b=>b.onclick=()=>{sound("tap");selectedKid=state.kids.find(k=>k.id===b.dataset.kid);screen="chips";render()});
-  document.querySelectorAll("[data-chip]").forEach(b=>b.onclick=()=>{sound(b.dataset.chip==="bonus"?"magic":"ticket");allowance={type:b.dataset.chip,remaining:Number(b.dataset.min)*60,total:Number(b.dataset.min)*60};screen="library";render()});
+  document.querySelectorAll("[data-chip]").forEach(b=>b.onclick=()=>{
+    try{
+      if(!selectedKid){screen="profiles";return render()}
+      const minutes=Math.max(1,Number(b.dataset.min)||minutesFor(selectedKid));
+      sound(b.dataset.chip==="bonus"?"magic":"ticket");
+      allowance={type:b.dataset.chip,remaining:minutes*60,total:minutes*60};
+      activeCategory="Alle";mediaMode="all";activeCollection=null;screen="library";render()
+    }catch(err){
+      console.error("Ticketwechsel fehlgeschlagen",err);
+      showToast("Ticket konnte nicht geöffnet werden");
+    }
+  });
   document.querySelectorAll("[data-category]").forEach(b=>b.onclick=()=>{activeCategory=b.dataset.category;render()});
   document.querySelectorAll("[data-media]").forEach(b=>b.onclick=()=>{mediaMode=b.dataset.media;activeCategory="Alle";render()});
   document.querySelectorAll("[data-collection]").forEach(b=>b.onclick=()=>{activeCollection=b.dataset.collection;screen="collection";render()});
@@ -740,7 +755,6 @@ async function act(a){
   if(a==="factoryReset"){if(confirm("Wirklich alle Bärflix-Daten löschen?")){localStorage.removeItem(KEY);location.reload()}}
   if(a==="closePlayer"){stopTimer();player=null;render()}
   if(a==="fullscreen"){const el=$("#yt");(el.requestFullscreen||el.webkitRequestFullscreen)?.call(el)}
-  if(a==="reload")location.reload()
 }
 
 function setAudience(colId,kidId,checked){
@@ -780,9 +794,9 @@ function ytMessage(ev){if(typeof ev.data!=="string")return;let d;try{d=JSON.pars
 function startTimer(){stopTimer();lastTick=Date.now();timerInterval=setInterval(()=>{const now=Date.now(),delta=(now-lastTick)/1000;lastTick=now;allowance.remaining=Math.max(0,allowance.remaining-delta);state.usage.push({kidId:selectedKid.id,episodeId:player.episodeId,date:today(),seconds:delta});if(state.usage.length>5000)state.usage=state.usage.slice(-5000);save();const bar=$("#progressFill");if(bar)bar.style.width=`${Math.max(0,Math.min(100,(allowance.remaining/(allowance.total||allowance.remaining))*100))}%`;if(allowance.remaining<=0)expireAllowance()},1000)}
 function stopTimer(){clearInterval(timerInterval);timerInterval=null}
 function expireAllowance(){stopTimer();const c=chipState(selectedKid.id);if(allowance.type==="bonus")c.bonus=Math.max(0,c.bonus-1);else c.used[allowance.type]=true;save();player=null;allowance=null;screen="chips";render();showToast("🎟️ Ticket ist aufgebraucht")}
-window.addEventListener("error",e=>{console.error(e.error||e.message);showToast("Bärflix-Fehler – bitte Seite neu laden")});
+window.addEventListener("error",e=>{console.error(e.error||e.message);showToast("Etwas hat kurz nicht funktioniert")});
 render();
-if("serviceWorker"in navigator&&location.protocol.startsWith("http"))window.addEventListener("load",()=>navigator.serviceWorker.register("./service-worker.js?v=8").catch(console.warn));
+if("serviceWorker"in navigator&&location.protocol.startsWith("http"))window.addEventListener("load",()=>navigator.serviceWorker.register("./service-worker.js?v=801").catch(console.warn));
 })();
 </script>
 </body>
