@@ -1,13 +1,13 @@
 {
-  "name": "Bärflix 9.0 Stable",
+  "name": "Bärflix – Premium Kids",
   "short_name": "Bärflix",
-  "description": "Private Familien-Mediathek für Ludwig und Fabian",
-  "start_url": "./",
+  "description": "Private, besonders einfache Familien-Mediathek für Ludwig und Fabian",
+  "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
-  "orientation": "any",
-  "background_color": "#75d2f3",
-  "theme_color": "#62c4ed",
+  "orientation": "landscape-primary",
+  "background_color": "#8bd5f2",
+  "theme_color": "#69ccef",
   "icons": [
     {
       "src": "./icons/icon.svg",
