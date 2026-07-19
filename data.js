@@ -1,4 +1,4 @@
-export const VERSION = "1.2.0";
+export const VERSION = "1.2.2";
 
 export const DEFAULT_SERIES = [
   {
@@ -21,6 +21,28 @@ export const DEFAULT_SERIES = [
       { id: "hot-pizza", title: "Das Rennen um 500 Pizzen – ganze Folge", youtubeId: "KNYlz2JZgkw", fullEpisode: true },
       { id: "hot-countdown", title: "Countdown zum großen Rennen – ganze Folge", youtubeId: "9uFQ8siwxKY", fullEpisode: true },
       { id: "hot-abenteuer", title: "Die verrücktesten Abenteuer – ganze Folgen", youtubeId: "zyoSy5fjNUI", fullEpisode: true }
+    ]
+  },
+  {
+    id: "paw-patrol",
+    title: "PAW Patrol",
+    emoji: "🐾",
+    source: "PAW Patrol Deutschland – offizieller Kanal",
+    episodes: [
+      { id: "paw-walross", title: "Die Welpen retten ein Walross – ganze Folge", youtubeId: "v_tKTvE3snM", fullEpisode: true },
+      { id: "paw-rubble", title: "Rubble wird Teil der PAW Patrol – ganze Folge", youtubeId: "cI9iaf6YIiQ", fullEpisode: true },
+      { id: "paw-piratenschatz", title: "Die Welpen und der Piratenschatz – ganze Folge", youtubeId: "9UiHDaSYmdc", fullEpisode: true }
+    ]
+  },
+  {
+    id: "rubble-crew",
+    title: "Rubble & Crew",
+    emoji: "🚧",
+    source: "PAW Patrol Deutschland – offizieller Kanal",
+    episodes: [
+      { id: "rubble-badewanne", title: "Die Crew baut eine Super-Badewanne – ganze Folge", youtubeId: "jbImhR33T6c", fullEpisode: true },
+      { id: "rubble-spielplatz", title: "Die Crew baut einen Spielplatz – ganze Folge", youtubeId: "o6yDVz0cvDU", fullEpisode: true },
+      { id: "rubble-dach", title: "Die Crew repariert ein Dach – ganze Folge", youtubeId: "qa8jeeDX19w", fullEpisode: true }
     ]
   },
   {

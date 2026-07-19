@@ -6,8 +6,9 @@ import {
   STICKERS
 } from "./data.js";
 
-const KEY = "baerenhaus.v12";
+const KEY = "baerenhaus.v122";
 const LEGACY_KEYS = [
+  "baerenhaus.v12",
   "baerenhaus.v1",
   "baerenhaus.v11",
   "baerflix.v91",
@@ -377,6 +378,7 @@ let activeSeriesId = null;
 let modal = null;
 let parentTab = "today";
 let playerContext = null;
+let navigationBusy = false;
 let youtubePlayer = null;
 let usageTimer = null;
 let lastPlayerSecond = null;
@@ -723,7 +725,7 @@ function parentContent() {
       return `<article class="parent-kid-card">
         <div class="parent-kid-head"><span>${esc(kid.avatar)}</span><h2>${esc(kid.name)}</h2></div>
         <div class="mini-ticket-row">${Object.entries(data.tickets)
-          .filter(([id, ticket]) => id !== "bonus" || ticket.total > 0)
+          .filter(([id, ticket]) => id !== "bonus" || ticket.units > 0)
           .map(([id, ticket]) => miniTicket(id, ticket, kid.id)).join("")}</div>
         <label class="ticket-length-row"><span>Minuten je ▶</span><input type="number" min="5" max="45" step="1" value="${minutesPerUnit(kid.id)}" data-ticket-minutes="${esc(kid.id)}"></label>
         <div class="counter-row"><span>Bonus-▶ heute</span><button data-bonus="${esc(kid.id)}:-1">−</button><strong>${data.tickets.bonus.units}</strong><button data-bonus="${esc(kid.id)}:1">+</button></div>
@@ -805,32 +807,75 @@ function playerOverlay(item, ticket = null, ticketId = "") {
   </div>`;
 }
 
-function render() {
+function recoverToHome() {
+  stopUsageTracker({ save: false });
+  try {
+    youtubePlayer?.pauseVideo?.();
+    youtubePlayer?.destroy?.();
+  } catch {}
+  youtubePlayer = null;
+  playerContext = null;
+  $(".video-player")?.remove();
+  modal = null;
+
   ensureDaily();
-  saveState();
-
-  if (!selectedKid && !["profiles", "parent"].includes(view)) view = "profiles";
-
-  let html;
-  switch (view) {
-    case "profiles": html = profilesView(); break;
-    case "home": html = homeView(); break;
-    case "tickets": html = ticketsView(); break;
-    case "flix": html = flixView(); break;
-    case "episodes": html = episodesView(); break;
-    case "music": html = musicView(); break;
-    case "treasure": html = treasureView(); break;
-    case "parent": html = parentView(); break;
-    default: view = "profiles"; html = profilesView();
+  if (selectedKid && state.kids.some(kid => kid.id === selectedKid.id)) {
+    view = "home";
+  } else {
+    selectedKid = null;
+    view = "profiles";
   }
 
-  if (modal?.type === "pin") html += pinModal();
-  if (modal?.type === "reward") html += rewardConfirmModal(modal.rewardId);
-  if (modal?.type === "content") html += contentModal(modal.kind, modal.id);
-  if (modal?.type === "rewardEditor") html += rewardEditorModal(modal.id);
+  try {
+    saveState();
+    render();
+    toast("Bärenhaus ist wieder bereit");
+  } catch (error) {
+    console.error("Automatische Wiederherstellung fehlgeschlagen", error);
+    location.reload();
+  }
+}
 
-  root.innerHTML = html;
-  bind();
+function render() {
+  try {
+    ensureDaily();
+    saveState();
+
+    if (!selectedKid && !["profiles", "parent"].includes(view)) view = "profiles";
+
+    let html;
+    switch (view) {
+      case "profiles": html = profilesView(); break;
+      case "home": html = homeView(); break;
+      case "tickets": html = ticketsView(); break;
+      case "flix": html = flixView(); break;
+      case "episodes": html = episodesView(); break;
+      case "music": html = musicView(); break;
+      case "treasure": html = treasureView(); break;
+      case "parent": html = parentView(); break;
+      default: view = "profiles"; html = profilesView();
+    }
+
+    if (modal?.type === "pin") html += pinModal();
+    if (modal?.type === "reward") html += rewardConfirmModal(modal.rewardId);
+    if (modal?.type === "content") html += contentModal(modal.kind, modal.id);
+    if (modal?.type === "rewardEditor") html += rewardEditorModal(modal.id);
+
+    root.innerHTML = html;
+    bind();
+  } catch (error) {
+    console.error("Ansicht konnte nicht aufgebaut werden", error);
+    modal = null;
+    if (selectedKid) {
+      view = "home";
+      root.innerHTML = homeView();
+    } else {
+      view = "profiles";
+      root.innerHTML = profilesView();
+    }
+    bind();
+    toast("Bärenhaus ist wieder bereit");
+  }
 }
 
 function bind() {
@@ -844,16 +889,28 @@ function bind() {
   });
 
   $$("[data-room]").forEach(button => button.onclick = () => {
+    if (navigationBusy) return;
+    navigationBusy = true;
     const room = button.dataset.room;
     sounds.play("open");
     speak(room === "flix" ? "Bärflix" : room === "music" ? "Musik" : "Schatzkiste");
-    if (room === "flix") {
-      const data = dailyKid();
-      view = data.activeTicketId && ticketRemaining(data.tickets[data.activeTicketId]) > 0 ? "flix" : "tickets";
-    } else {
-      view = room;
+    try {
+      if (room === "flix") {
+        const data = dailyKid();
+        const activeTicket = data.activeTicketId ? data.tickets[data.activeTicketId] : null;
+        view = activeTicket && ticketRemainingSeconds(activeTicket, selectedKid.id) > 0.5
+          ? "flix"
+          : "tickets";
+      } else {
+        view = room;
+      }
+      render();
+    } catch (error) {
+      console.error("Bereich konnte nicht geöffnet werden", error);
+      recoverToHome();
+    } finally {
+      setTimeout(() => { navigationBusy = false; }, 180);
     }
-    render();
   });
 
   $$("[data-ticket]").forEach(button => button.onclick = () => {
@@ -1446,16 +1503,32 @@ document.addEventListener("visibilitychange", () => {
 
 window.addEventListener("error", event => {
   console.error(event.error || event.message);
-  toast("🐻");
+  if (!$(".video-player") && selectedKid && view !== "parent") {
+    setTimeout(recoverToHome, 0);
+  } else {
+    toast("🐻");
+  }
 });
 
 window.addEventListener("unhandledrejection", event => {
   console.error(event.reason);
-  toast("🐻");
+  if (!$(".video-player") && selectedKid && view !== "parent") {
+    setTimeout(recoverToHome, 0);
+  } else {
+    toast("🐻");
+  }
+});
+
+window.addEventListener("pageshow", event => {
+  if (event.persisted) {
+    navigationBusy = false;
+    ensureDaily();
+    render();
+  }
 });
 
 if ("serviceWorker" in navigator) {
-  window.addEventListener("load", () => navigator.serviceWorker.register("./service-worker.js?v=120").catch(console.warn));
+  window.addEventListener("load", () => navigator.serviceWorker.register("./service-worker.js?v=122").catch(console.warn));
 }
 
 render();

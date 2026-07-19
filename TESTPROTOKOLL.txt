@@ -1,0 +1,12 @@
+TESTPROTOKOLL – BÄRENHAUS 1.2.2
+
+TECHNISCHE PRÜFUNGEN
+- JavaScript-Syntax bestanden: app.js, data.js, service-worker.js
+- Vorbereitete Serien: 10
+- Ganze vorbereitete Folgen: 30
+- Neue Serien: PAW Patrol und Rubble & Crew
+- Neue ganze Folgen: 6
+- Doppelte vorbereitete Video-IDs: 0
+- Datenmigration von Bärenhaus 1.2.1 vorhanden
+- Stabilitätskorrekturen aus 1.2.1 unverändert enthalten
+- ZIP-Integrität geprüft

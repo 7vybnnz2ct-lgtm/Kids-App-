@@ -1,22 +1,18 @@
-BÄRENHAUS 1.2 – QUELLEN- UND QUALITÄTSPRINZIP
+BÄRENHAUS 1.2.2 – QUELLEN
 
-Für die vorbereitete Bärflix-Mediathek werden nur Videos verwendet,
-die vom jeweiligen offiziellen Kanal ausdrücklich als „ganze Folge“
-beziehungsweise als Sammlung ganzer Folgen bezeichnet werden.
+NEUE SERIEN
 
-Verwendete offizielle Quellen:
-- Nick Jr. Deutschland: Blaze
-- Hot Wheels Deutsch
-- Feuerwehrmann Sam / KiKAninchen
-- Super Wings Deutsch – offizieller Kanal von TOGGO
-- Thomas & seine Freunde Deutschland
-- Die Fixies – offizieller Kanal
-- Bing Deutsch – offizieller Kanal
-- Simon Super Hase – Deutsch
+PAW Patrol
+Quelle: PAW Patrol Deutschland / offizieller deutscher PAW-Patrol-Kanal
+- v_tKTvE3snM – Die Welpen retten ein Walross – GANZE FOLGE
+- cI9iaf6YIiQ – Rubble wird Teil der PAW Patrol – GANZE FOLGE
+- 9UiHDaSYmdc – Die Welpen und der Piratenschatz – GANZE FOLGE
 
-Nicht mehr vorbereitet:
-- Die Tautropfentagebücher, weil die verfügbaren Einträge kurze Ausschnitte
-  statt verlässlich ganzer Folgen waren.
+Rubble & Crew
+Quelle: offizieller deutscher PAW-Patrol-Kanal
+- jbImhR33T6c – Die Crew baut eine Super-Badewanne – Ganze Folge
+- o6yDVz0cvDU – Die Crew baut einen Spielplatz – Ganze Folge
+- qa8jeeDX19w – Die Crew repariert ein Dach – Ganze Folge
 
-Bärenhaus lädt keine fremden Videodateien herunter.
-Es werden ausschließlich YouTube-Video-IDs im Datenschutzmodus eingebettet.
+Bärenhaus lädt keine fremden Videos herunter. Es werden ausschließlich
+YouTube-Video-IDs im Datenschutzmodus eingebettet.

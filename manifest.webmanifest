@@ -1,7 +1,7 @@
 {
-  "name": "Bärenhaus – Pausierbare Folgenzeit",
+  "name": "Bärenhaus – PAW Patrol & Rubble & Crew",
   "short_name": "Bärenhaus",
-  "description": "Familien-App mit Bärflix, Musik und pausierbaren Folgen-Tickets.",
+  "description": "Stabile Familien-App mit Bärflix, Musik, PAW Patrol, Rubble & Crew und pausierbaren Folgen-Tickets.",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
