@@ -1,7 +1,7 @@
 {
-  "name": "Bärenhaus – Familien-App",
+  "name": "Bärenhaus – Bärflix & Musik",
   "short_name": "Bärenhaus",
-  "description": "Private Familien-App mit Bärflix, Tagesplan, Musik, Schatzkammer und Familienalbum.",
+  "description": "Private Familien-App mit Bärflix, Musik und optionaler Schatzkiste.",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",

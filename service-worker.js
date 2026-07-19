@@ -1,11 +1,10 @@
-const CACHE = "baerenhaus-premium-v100";
+const CACHE = "baerenhaus-fokus-v110";
 const STATIC = [
   "./",
   "./index.html",
   "./styles.css",
   "./app.js",
   "./data.js",
-  "./media-store.js",
   "./manifest.webmanifest",
   "./assets/icons/icon-192.png",
   "./assets/icons/icon-512.png",
@@ -35,11 +34,9 @@ self.addEventListener("fetch", event => {
   const url = new URL(event.request.url);
   if (url.origin !== self.location.origin) return;
 
-  event.respondWith(
-    fetch(event.request).then(response => {
-      const copy = response.clone();
-      caches.open(CACHE).then(cache => cache.put(event.request, copy));
-      return response;
-    }).catch(() => caches.match(event.request).then(cached => cached || caches.match("./index.html")))
-  );
+  event.respondWith(fetch(event.request).then(response => {
+    const copy = response.clone();
+    caches.open(CACHE).then(cache => cache.put(event.request, copy));
+    return response;
+  }).catch(() => caches.match(event.request).then(cached => cached || caches.match("./index.html"))));
 });
