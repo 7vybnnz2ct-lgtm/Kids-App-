@@ -1,4 +1,4 @@
-const CACHE = "baerenhaus-fokus-v110";
+const CACHE = "baerenhaus-folgenzeit-v120";
 const STATIC = [
   "./",
   "./index.html",

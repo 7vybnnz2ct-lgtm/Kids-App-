@@ -278,3 +278,94 @@ img { display: block; max-width: 100%; }
   .admin-row { grid-template-columns: 78px 1fr; }.admin-row > button, .admin-row > .row-actions { grid-column: 1/-1; }.admin-row img { width: 78px; }.admin-row.compact { grid-template-columns: auto 1fr; }
   .form-grid { grid-template-columns: 1fr; }.field.wide { grid-column: auto; }
 }
+
+
+/* BÄRENHAUS 1.2 – pausierbare Folgenzeit */
+.progress-play {
+  --progress: 100%;
+  position: relative;
+  isolation: isolate;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  background: conic-gradient(#fff var(--progress), rgba(255,255,255,.23) 0);
+  box-shadow: 0 8px 20px rgba(44,77,91,.18);
+  font-style: normal;
+}
+.progress-play::before {
+  content: "";
+  position: absolute;
+  inset: 7px;
+  z-index: -1;
+  border-radius: inherit;
+  background: rgba(255,255,255,.86);
+}
+.progress-play span {
+  position: relative;
+  z-index: 2;
+  color: #df5f75;
+  transform: translateX(2px);
+}
+.progress-play.large { width: 76px; height: 76px; font-size: 29px; }
+.progress-play.small { width: 31px; height: 31px; font-size: 11px; }
+.progress-play.small::before { inset: 4px; }
+.progress-play.empty { opacity: .23; filter: grayscale(.7); }
+
+.ticket-plays .progress-play,
+.bonus-plays .progress-play {
+  background: conic-gradient(#fff var(--progress), rgba(255,255,255,.22) 0);
+}
+.ticket-plays .progress-play::before,
+.bonus-plays .progress-play::before {
+  background: rgba(255,255,255,.86);
+}
+.ticket-dots .progress-play,
+.player-tickets .progress-play {
+  width: 31px;
+  height: 31px;
+  background: conic-gradient(#ff9db8 var(--progress), rgba(255,255,255,.18) 0);
+  box-shadow: none;
+}
+.ticket-dots .progress-play::before,
+.player-tickets .progress-play::before {
+  background: #fff;
+}
+.player-tickets .progress-play span { color: #df5f75; }
+
+.youtube-player, .youtube-player iframe {
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+.ticket-length-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 11px 0;
+}
+.ticket-length-row span {
+  flex: 1;
+  font-weight: 900;
+}
+.ticket-length-row input {
+  width: 82px;
+  border: 2px solid #dce9ee;
+  border-radius: 12px;
+  padding: 9px;
+  background: #fff;
+  color: var(--ink);
+  text-align: center;
+  font-weight: 900;
+}
+
+.ticket-card .ticket-plays i,
+.ticket-card .bonus-plays i {
+  padding-left: 0;
+}
+
+@media (max-width: 650px) {
+  .progress-play.large { width: 59px; height: 59px; font-size: 23px; }
+  .progress-play.large::before { inset: 6px; }
+}

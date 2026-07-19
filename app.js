@@ -6,8 +6,9 @@ import {
   STICKERS
 } from "./data.js";
 
-const KEY = "baerenhaus.v1";
+const KEY = "baerenhaus.v12";
 const LEGACY_KEYS = [
+  "baerenhaus.v1",
   "baerenhaus.v11",
   "baerflix.v91",
   "baerflix.v9",
@@ -41,8 +42,8 @@ function baseState() {
     version: VERSION,
     pin: "1234",
     kids: [
-      { id: "ludwig", name: "Ludwig", avatar: "🧒", accent: "blue" },
-      { id: "fabian", name: "Fabian", avatar: "👦", accent: "pink" }
+      { id: "ludwig", name: "Ludwig", avatar: "🧒", accent: "blue", ticketMinutes: 15 },
+      { id: "fabian", name: "Fabian", avatar: "👦", accent: "pink", ticketMinutes: 15 }
     ],
     series: copy(DEFAULT_SERIES),
     music: copy(DEFAULT_MUSIC),
@@ -58,7 +59,8 @@ function baseState() {
       smartSort: true,
       childLabels: true,
       voiceLabels: false,
-      treasureEnabled: true
+      treasureEnabled: true,
+      finishEpisode: true
     }
   };
 }
@@ -165,7 +167,8 @@ function normalize(raw, options = {}) {
         id: String(kid?.id || `kind-${index + 1}`),
         name: String(kid?.name || `Kind ${index + 1}`),
         avatar: String(kid?.avatar || "🧒"),
-        accent: String(kid?.accent || (index % 2 ? "pink" : "blue"))
+        accent: String(kid?.accent || (index % 2 ? "pink" : "blue")),
+        ticketMinutes: Math.max(5, Math.min(45, Number(kid?.ticketMinutes) || 15))
       }))
     : base.kids;
 
@@ -210,7 +213,8 @@ function normalize(raw, options = {}) {
       ...base.settings,
       ...(input.settings || {}),
       volume: Math.min(1, Math.max(0, Number(input.settings?.volume ?? base.settings.volume))),
-      treasureEnabled: input.settings?.treasureEnabled !== false
+      treasureEnabled: input.settings?.treasureEnabled !== false,
+      finishEpisode: input.settings?.finishEpisode !== false
     }
   });
 }
@@ -218,13 +222,20 @@ function normalize(raw, options = {}) {
 function migrateLegacy(raw) {
   const base = baseState();
   if (!raw || typeof raw !== "object") return base;
+
+  const curatedTitles = new Set(DEFAULT_SERIES.map(series => slug(series.title)));
+  const customSeries = array(raw.series || raw.collections)
+    .filter(series => !curatedTitles.has(slug(series?.title)));
+
   return normalize({
     ...base,
     ...raw,
-    series: raw.series || raw.collections || [],
-    music: raw.music || [],
-    stars: raw.stars || base.stars
-  }, { seedDefaults: true });
+    kids: array(raw.kids).length ? raw.kids : base.kids,
+    series: [...copy(DEFAULT_SERIES), ...customSeries],
+    music: Array.isArray(raw.music) ? raw.music : copy(DEFAULT_MUSIC),
+    stars: raw.stars || base.stars,
+    settings: { ...base.settings, ...(raw.settings || {}), finishEpisode: true }
+  });
 }
 
 function loadState() {
@@ -249,17 +260,43 @@ function saveState() {
 function newDailyKid() {
   return {
     tickets: {
-      single1: { kind: "single", total: 1, used: 0 },
-      single2: { kind: "single", total: 1, used: 0 },
-      double: { kind: "double", total: 2, used: 0 },
-      bonus: { kind: "bonus", total: 0, used: 0 }
+      single1: { kind: "single", units: 1, usedSeconds: 0 },
+      single2: { kind: "single", units: 1, usedSeconds: 0 },
+      double: { kind: "double", units: 2, usedSeconds: 0 },
+      bonus: { kind: "bonus", units: 0, usedSeconds: 0 }
     },
     activeTicketId: null
   };
 }
 
-function ticketRemaining(ticket) {
-  return Math.max(0, Number(ticket?.total || 0) - Number(ticket?.used || 0));
+function minutesPerUnit(kidId = selectedKid?.id) {
+  const kid = state.kids.find(item => item.id === kidId);
+  return Math.max(5, Math.min(45, Number(kid?.ticketMinutes) || 15));
+}
+
+function unitSeconds(kidId = selectedKid?.id) {
+  return minutesPerUnit(kidId) * 60;
+}
+
+function ticketTotalSeconds(ticket, kidId = selectedKid?.id) {
+  return Math.max(0, Number(ticket?.units || 0) * unitSeconds(kidId));
+}
+
+function ticketRemainingSeconds(ticket, kidId = selectedKid?.id) {
+  return Math.max(0, ticketTotalSeconds(ticket, kidId) - Math.max(0, Number(ticket?.usedSeconds || 0)));
+}
+
+function ticketUnitFraction(ticket, unitIndex, kidId = selectedKid?.id) {
+  const seconds = unitSeconds(kidId);
+  const spent = Math.max(0, Number(ticket?.usedSeconds || 0) - unitIndex * seconds);
+  return Math.max(0, Math.min(1, (seconds - Math.min(seconds, spent)) / seconds));
+}
+
+function progressBubble(ticket, ticketId, unitIndex, size = "normal", kidId = selectedKid?.id) {
+  const fraction = ticketUnitFraction(ticket, unitIndex, kidId);
+  return `<i class="progress-play ${size} ${fraction <= 0.001 ? "empty" : ""}"
+    data-progress-ticket="${esc(ticketId)}" data-progress-unit="${unitIndex}"
+    style="--progress:${(fraction * 100).toFixed(2)}%"><span>▶</span></i>`;
 }
 
 function ensureDaily(target = state) {
@@ -274,16 +311,21 @@ function ensureDaily(target = state) {
     daily.tickets ||= newDailyKid().tickets;
 
     for (const [id, template] of Object.entries(newDailyKid().tickets)) {
+      const previous = daily.tickets[id] || {};
+      const units = Math.max(0, Number(previous.units ?? previous.total ?? template.units));
+      const migratedUsedSeconds = Number.isFinite(Number(previous.usedSeconds))
+        ? Number(previous.usedSeconds)
+        : Math.max(0, Number(previous.used || 0)) * unitSeconds(kid.id);
+
       daily.tickets[id] = {
-        ...template,
-        ...(daily.tickets[id] || {}),
-        total: Math.max(0, Number(daily.tickets[id]?.total ?? template.total)),
-        used: Math.max(0, Number(daily.tickets[id]?.used ?? 0))
+        kind: previous.kind || template.kind,
+        units,
+        usedSeconds: Math.min(Math.max(0, migratedUsedSeconds), units * unitSeconds(kid.id))
       };
-      daily.tickets[id].used = Math.min(daily.tickets[id].used, daily.tickets[id].total);
     }
 
-    if (!daily.tickets[daily.activeTicketId] || ticketRemaining(daily.tickets[daily.activeTicketId]) <= 0) {
+    if (!daily.tickets[daily.activeTicketId] ||
+        ticketRemainingSeconds(daily.tickets[daily.activeTicketId], kid.id) <= 0) {
       daily.activeTicketId = null;
     }
   }
@@ -297,7 +339,14 @@ function dailyKid(kidId = selectedKid?.id) {
 
 function availableTicketCards(kidId) {
   return Object.values(dailyKid(kidId)?.tickets || {})
-    .filter(ticket => ticketRemaining(ticket) > 0).length;
+    .filter(ticket => ticketRemainingSeconds(ticket, kidId) > 0.5).length;
+}
+
+function formatSeconds(seconds) {
+  const value = Math.max(0, Math.ceil(Number(seconds) || 0));
+  const minutes = Math.floor(value / 60);
+  const rest = value % 60;
+  return `${minutes}:${String(rest).padStart(2, "0")}`;
 }
 
 class SoundManager {
@@ -328,6 +377,24 @@ let activeSeriesId = null;
 let modal = null;
 let parentTab = "today";
 let playerContext = null;
+let youtubePlayer = null;
+let usageTimer = null;
+let lastPlayerSecond = null;
+let lastUsageSave = 0;
+
+let resolveYouTubeReady;
+const youtubeReady = new Promise(resolve => {
+  resolveYouTubeReady = resolve;
+  if (window.YT?.Player) {
+    resolve();
+  } else {
+    const previous = window.onYouTubeIframeAPIReady;
+    window.onYouTubeIframeAPIReady = () => {
+      if (typeof previous === "function") previous();
+      resolve();
+    };
+  }
+});
 
 const root = $("#root");
 const toastElement = $("#toast");
@@ -420,7 +487,7 @@ function homeView() {
     <button class="media-portal flix-portal" data-room="flix" aria-label="Bärflix">
       ${posterStrip(topSeries, "series")}
       <div class="portal-overlay"><strong>🎬 Bärflix</strong><i>▶</i></div>
-      <b class="portal-badge">${availableTicketCards(selectedKid.id)}</b>
+      <b class="portal-badge">${availableTicketCards(selectedKid.id) ? "🎟️" : "💤"}</b>
     </button>
 
     <button class="media-portal music-portal" data-room="music" aria-label="Musik">
@@ -438,12 +505,15 @@ function homeView() {
 }
 
 function ticketCard(ticket, id) {
-  const remaining = ticketRemaining(ticket);
-  const plays = Array.from({ length: ticket.total }, (_, index) =>
-    `<i class="${index < remaining ? "on" : "off"}">▶</i>`).join("");
-  return `<button class="ticket-card ${ticket.kind} ${id}" data-ticket="${id}" aria-label="${ticket.kind === "double" ? "Zwei Folgen" : ticket.kind === "bonus" ? "Bonus" : "Eine Folge"}">
+  const plays = Array.from({ length: ticket.units }, (_, index) =>
+    progressBubble(ticket, id, index, "large")).join("");
+
+  return `<button class="ticket-card ${ticket.kind} ${id}" data-ticket="${id}"
+    aria-label="${ticket.kind === "double" ? "Zwei Folgen" : ticket.kind === "bonus" ? "Bonus" : "Eine Folge"}">
     <span class="ticket-cut left"></span><span class="ticket-cut right"></span>
-    ${ticket.kind === "bonus" ? `<em>⭐</em><div class="bonus-plays">${plays}</div>` : `<div class="ticket-plays">${plays}</div>`}
+    ${ticket.kind === "bonus"
+      ? `<em>⭐</em><div class="bonus-plays">${plays}</div>`
+      : `<div class="ticket-plays">${plays}</div>`}
   </button>`;
 }
 
@@ -453,10 +523,10 @@ function ticketsView() {
     <section class="tickets-focus">
       <div class="ticket-mascot">🐻🎟️</div>
       <div class="ticket-layout">
-        ${ticketRemaining(tickets.single1) ? ticketCard(tickets.single1, "single1") : ""}
-        ${ticketRemaining(tickets.single2) ? ticketCard(tickets.single2, "single2") : ""}
-        ${ticketRemaining(tickets.double) ? ticketCard(tickets.double, "double") : ""}
-        ${ticketRemaining(tickets.bonus) ? ticketCard(tickets.bonus, "bonus") : ""}
+        ${ticketRemainingSeconds(tickets.single1) > 0.5 ? ticketCard(tickets.single1, "single1") : ""}
+        ${ticketRemainingSeconds(tickets.single2) > 0.5 ? ticketCard(tickets.single2, "single2") : ""}
+        ${ticketRemainingSeconds(tickets.double) > 0.5 ? ticketCard(tickets.double, "double") : ""}
+        ${ticketRemainingSeconds(tickets.bonus) > 0.5 ? ticketCard(tickets.bonus, "bonus") : ""}
       </div>
       ${availableTicketCards(selectedKid.id) ? "" : `<div class="all-used">🐻💤</div>`}
     </section>`);
@@ -474,8 +544,8 @@ function activeTicketDots() {
   const data = dailyKid();
   const ticket = data?.tickets?.[data.activeTicketId];
   if (!ticket) return "";
-  return `<div class="ticket-dots">${Array.from({ length: ticket.total }, (_, index) =>
-    `<i class="${index < ticketRemaining(ticket) ? "on" : ""}">▶</i>`).join("")}</div>`;
+  return `<div class="ticket-dots">${Array.from({ length: ticket.units }, (_, index) =>
+    progressBubble(ticket, data.activeTicketId, index, "small")).join("")}</div>`;
 }
 
 function flixView() {
@@ -638,8 +708,12 @@ function parentView() {
   </section>`, { parent: false });
 }
 
-function miniTicket(id, ticket) {
-  return `<div class="mini-ticket ${ticket.kind}"><span>${id.startsWith("single") ? "▶" : id === "double" ? "▶▶" : "⭐"}</span><small>${ticket.used}/${ticket.total}</small></div>`;
+function miniTicket(id, ticket, kidId) {
+  const symbol = id.startsWith("single") ? "▶" : id === "double" ? "▶▶" : "⭐";
+  return `<div class="mini-ticket ${ticket.kind}">
+    <span>${symbol}</span>
+    <small>${formatSeconds(ticketRemainingSeconds(ticket, kidId))}</small>
+  </div>`;
 }
 
 function parentContent() {
@@ -650,8 +724,9 @@ function parentContent() {
         <div class="parent-kid-head"><span>${esc(kid.avatar)}</span><h2>${esc(kid.name)}</h2></div>
         <div class="mini-ticket-row">${Object.entries(data.tickets)
           .filter(([id, ticket]) => id !== "bonus" || ticket.total > 0)
-          .map(([id, ticket]) => miniTicket(id, ticket)).join("")}</div>
-        <div class="counter-row"><span>Bonus-Folgen heute</span><button data-bonus="${esc(kid.id)}:-1">−</button><strong>${data.tickets.bonus.total}</strong><button data-bonus="${esc(kid.id)}:1">+</button></div>
+          .map(([id, ticket]) => miniTicket(id, ticket, kid.id)).join("")}</div>
+        <label class="ticket-length-row"><span>Minuten je ▶</span><input type="number" min="5" max="45" step="1" value="${minutesPerUnit(kid.id)}" data-ticket-minutes="${esc(kid.id)}"></label>
+        <div class="counter-row"><span>Bonus-▶ heute</span><button data-bonus="${esc(kid.id)}:-1">−</button><strong>${data.tickets.bonus.units}</strong><button data-bonus="${esc(kid.id)}:1">+</button></div>
         ${state.settings.treasureEnabled ? `<div class="counter-row"><span>Sterne</span><button data-stars="${esc(kid.id)}:-1">−</button><strong>⭐ ${state.stars[kid.id] || 0}</strong><button data-stars="${esc(kid.id)}:1">+</button></div>` : ""}
         <button class="secondary-button full" data-reset-tickets="${esc(kid.id)}">Tickets zurücksetzen</button>
       </article>`;
@@ -690,6 +765,7 @@ function parentContent() {
       <label class="switch-row"><span>Kurze Namen anzeigen</span><input id="settingLabels" type="checkbox" ${state.settings.childLabels ? "checked" : ""}></label>
       <label class="switch-row"><span>Bereiche vorlesen</span><input id="settingVoice" type="checkbox" ${state.settings.voiceLabels ? "checked" : ""}></label>
       <label class="switch-row"><span>Lieblingsserien zuerst</span><input id="settingSmart" type="checkbox" ${state.settings.smartSort ? "checked" : ""}></label>
+      <label class="switch-row"><span>Begonnene ganze Folge zu Ende ansehen</span><input id="settingFinishEpisode" type="checkbox" ${state.settings.finishEpisode ? "checked" : ""}></label>
     </section>
     <section class="settings-card">
       <h2>Töne</h2>
@@ -714,12 +790,18 @@ function parentContent() {
   </div>`;
 }
 
-function playerOverlay(item, remaining = null) {
+function playerOverlay(item, ticket = null, ticketId = "") {
+  const progress = ticket
+    ? `<div class="player-tickets">${Array.from({ length: ticket.units }, (_, index) =>
+        progressBubble(ticket, ticketId, index, "small")).join("")}</div>`
+    : "";
+
   return `<div class="video-player">
-    <div class="player-bar"><button class="round-button" data-action="closePlayer" aria-label="Zurück">←</button>
-      ${remaining === null ? "" : `<div class="player-tickets">${Array.from({ length: remaining }, () => "<i>▶</i>").join("")}</div>`}
+    <div class="player-bar">
+      <button class="round-button" data-action="closePlayer" aria-label="Zurück">←</button>
+      ${progress}
     </div>
-    <iframe title="${esc(item.title)}" src="https://www.youtube-nocookie.com/embed/${item.youtubeId}?autoplay=1&rel=0&modestbranding=1&playsinline=1&iv_load_policy=3" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe>
+    <div id="youtubePlayer" class="youtube-player" aria-label="${esc(item.title)}"></div>
   </div>`;
 }
 
@@ -777,7 +859,7 @@ function bind() {
   $$("[data-ticket]").forEach(button => button.onclick = () => {
     const data = dailyKid();
     const id = button.dataset.ticket;
-    if (!data.tickets[id] || ticketRemaining(data.tickets[id]) <= 0) return;
+    if (!data.tickets[id] || ticketRemainingSeconds(data.tickets[id]) <= 0.5) return;
     data.activeTicketId = id;
     sounds.play("ticket");
     view = "flix";
@@ -843,10 +925,24 @@ function bind() {
   $$("[data-bonus]").forEach(button => button.onclick = () => {
     const [kidId, deltaText] = button.dataset.bonus.split(":");
     const bonus = dailyKid(kidId).tickets.bonus;
-    bonus.total = Math.max(0, Math.min(5, bonus.total + Number(deltaText)));
-    bonus.used = Math.min(bonus.used, bonus.total);
-    if (!bonus.total && dailyKid(kidId).activeTicketId === "bonus") dailyKid(kidId).activeTicketId = null;
+    bonus.units = Math.max(0, Math.min(5, bonus.units + Number(deltaText)));
+    bonus.usedSeconds = Math.min(bonus.usedSeconds, bonus.units * unitSeconds(kidId));
+    if (!bonus.units && dailyKid(kidId).activeTicketId === "bonus") dailyKid(kidId).activeTicketId = null;
     sounds.play("tap");
+    saveState();
+    render();
+  });
+
+  $$("[data-ticket-minutes]").forEach(input => input.onchange = () => {
+    const kid = state.kids.find(item => item.id === input.dataset.ticketMinutes);
+    if (!kid) return;
+    kid.ticketMinutes = Math.max(5, Math.min(45, Number(input.value) || 15));
+
+    const data = dailyKid(kid.id);
+    for (const ticket of Object.values(data.tickets)) {
+      ticket.usedSeconds = Math.min(ticket.usedSeconds, ticket.units * unitSeconds(kid.id));
+    }
+    sounds.play("done");
     saveState();
     render();
   });
@@ -861,9 +957,9 @@ function bind() {
 
   $$("[data-reset-tickets]").forEach(button => button.onclick = () => {
     const kidId = button.dataset.resetTickets;
-    const bonus = dailyKid(kidId).tickets.bonus.total;
+    const bonus = dailyKid(kidId).tickets.bonus.units;
     state.daily.kids[kidId] = newDailyKid();
-    state.daily.kids[kidId].tickets.bonus.total = bonus;
+    state.daily.kids[kidId].tickets.bonus.units = bonus;
     sounds.play("done");
     saveState();
     render();
@@ -997,25 +1093,108 @@ function action(name) {
   if (name === "resetApp") return resetApp();
 }
 
-function play(kind, id) {
+function updateProgressVisuals(ticketId, ticket, kidId = selectedKid?.id) {
+  $$(`[data-progress-ticket="${CSS.escape(ticketId)}"]`).forEach(element => {
+    const index = Number(element.dataset.progressUnit);
+    const fraction = ticketUnitFraction(ticket, index, kidId);
+    element.style.setProperty("--progress", `${(fraction * 100).toFixed(2)}%`);
+    element.classList.toggle("empty", fraction <= 0.001);
+  });
+}
+
+function stopUsageTracker({ save = true } = {}) {
+  clearInterval(usageTimer);
+  usageTimer = null;
+  lastPlayerSecond = null;
+  if (save) saveState();
+}
+
+function handleTicketExpired() {
+  if (!playerContext || playerContext.kind !== "series" || playerContext.ticketExpired) return;
+  playerContext.ticketExpired = true;
+  stopUsageTracker();
+  sounds.play("done");
+
+  if (!state.settings.finishEpisode) {
+    try { youtubePlayer?.pauseVideo(); } catch {}
+    setTimeout(() => closePlayer(), 350);
+  }
+}
+
+function consumePlayback(seconds) {
+  if (!playerContext || playerContext.kind !== "series" || playerContext.ticketExpired) return;
+  const data = dailyKid();
+  const ticket = data.tickets[playerContext.ticketId];
+  if (!ticket) return;
+
+  ticket.usedSeconds = Math.min(
+    ticketTotalSeconds(ticket),
+    Math.max(0, Number(ticket.usedSeconds || 0) + Math.max(0, seconds))
+  );
+  updateProgressVisuals(playerContext.ticketId, ticket);
+
+  const now = Date.now();
+  if (now - lastUsageSave > 2500) {
+    lastUsageSave = now;
+    saveState();
+  }
+
+  if (ticketRemainingSeconds(ticket) <= 0.05) handleTicketExpired();
+}
+
+function startUsageTracker() {
+  if (!playerContext || playerContext.kind !== "series" || playerContext.ticketExpired || usageTimer) return;
+  lastPlayerSecond = null;
+
+  usageTimer = setInterval(() => {
+    if (!youtubePlayer?.getCurrentTime) return;
+    let current;
+    try {
+      current = Number(youtubePlayer.getCurrentTime());
+    } catch {
+      return;
+    }
+    if (!Number.isFinite(current)) return;
+
+    if (lastPlayerSecond !== null) {
+      const delta = current - lastPlayerSecond;
+      if (delta > 0 && delta < 2.5) consumePlayback(delta);
+    }
+    lastPlayerSecond = current;
+  }, 500);
+}
+
+function onPlayerStateChange(event) {
+  if (!window.YT) return;
+  if (event.data === YT.PlayerState.PLAYING) {
+    startUsageTracker();
+  } else {
+    stopUsageTracker();
+    if (event.data === YT.PlayerState.ENDED) {
+      setTimeout(() => closePlayer(), 450);
+    }
+  }
+}
+
+async function play(kind, id) {
   let item;
-  let remaining = null;
+  let ticket = null;
+  let ticketId = "";
 
   if (kind === "series") {
     const series = state.series.find(entry => entry.id === activeSeriesId);
     item = series?.episodes.find(episode => episode.id === id);
     const data = dailyKid();
-    const ticket = data.tickets[data.activeTicketId];
+    ticketId = data.activeTicketId;
+    ticket = data.tickets[ticketId];
 
-    if (!ticket || ticketRemaining(ticket) <= 0) {
+    if (!ticket || ticketRemainingSeconds(ticket) <= 0.5) {
       data.activeTicketId = null;
       view = "tickets";
       sounds.play("error");
       return render();
     }
 
-    ticket.used += 1;
-    remaining = ticketRemaining(ticket);
     state.history.push({
       kidId: selectedKid.id,
       seriesId: series.id,
@@ -1024,29 +1203,79 @@ function play(kind, id) {
       at: new Date().toISOString()
     });
     state.history = state.history.slice(-1000);
-    playerContext = { kind, ticketId: data.activeTicketId, returnView: "episodes" };
+    playerContext = { kind, ticketId, returnView: "episodes", ticketExpired: false };
   } else {
     item = state.music.find(entry => entry.id === id);
-    playerContext = { kind, returnView: "music" };
+    playerContext = { kind, returnView: "music", ticketExpired: false };
   }
 
   if (!item) return sounds.play("error");
+
+  stopUsageTracker({ save: false });
   saveState();
   sounds.play("open");
-  document.body.insertAdjacentHTML("beforeend", playerOverlay(item, remaining));
+  document.body.insertAdjacentHTML("beforeend", playerOverlay(item, ticket, ticketId));
   bind();
+
+  try {
+    await Promise.race([
+      youtubeReady,
+      new Promise((_, reject) => setTimeout(() => reject(new Error("YouTube API timeout")), 10000))
+    ]);
+    if (!$("#youtubePlayer")) return;
+
+    youtubePlayer = new YT.Player("youtubePlayer", {
+      host: "https://www.youtube-nocookie.com",
+      videoId: item.youtubeId,
+      playerVars: {
+        autoplay: 1,
+        controls: 1,
+        rel: 0,
+        modestbranding: 1,
+        playsinline: 1,
+        iv_load_policy: 3
+      },
+      events: {
+        onReady: event => event.target.playVideo(),
+        onStateChange: onPlayerStateChange,
+        onError: () => {
+          sounds.play("error");
+          toast("Video konnte nicht geöffnet werden");
+        }
+      }
+    });
+  } catch (error) {
+    console.error(error);
+    $(".video-player")?.remove();
+    playerContext = null;
+    sounds.play("error");
+    toast("Video konnte nicht geöffnet werden");
+  }
 }
 
 function closePlayer() {
+  stopUsageTracker();
+
+  try {
+    youtubePlayer?.pauseVideo?.();
+    youtubePlayer?.destroy?.();
+  } catch {}
+  youtubePlayer = null;
   $(".video-player")?.remove();
+
   if (playerContext?.kind === "series") {
     const data = dailyKid();
     const ticket = data.tickets[playerContext.ticketId];
-    if (!ticket || ticketRemaining(ticket) <= 0) {
+    if (!ticket || ticketRemainingSeconds(ticket) <= 0.5) {
       data.activeTicketId = null;
       view = "tickets";
-    } else view = playerContext.returnView;
-  } else if (playerContext?.kind === "music") view = "music";
+    } else {
+      view = playerContext.returnView;
+    }
+  } else if (playerContext?.kind === "music") {
+    view = "music";
+  }
+
   playerContext = null;
   sounds.play("tap");
   render();
@@ -1151,6 +1380,7 @@ function saveSettings() {
   state.settings.childLabels = $("#settingLabels")?.checked ?? true;
   state.settings.voiceLabels = $("#settingVoice")?.checked ?? false;
   state.settings.smartSort = $("#settingSmart")?.checked ?? true;
+  state.settings.finishEpisode = $("#settingFinishEpisode")?.checked ?? true;
   state.settings.sounds = $("#settingSounds")?.checked ?? true;
   state.settings.volume = Number($("#settingVolume")?.value ?? 0.7);
 
@@ -1206,6 +1436,14 @@ function resetApp() {
   render();
 }
 
+
+document.addEventListener("visibilitychange", () => {
+  if (document.hidden) {
+    stopUsageTracker();
+    try { youtubePlayer?.pauseVideo?.(); } catch {}
+  }
+});
+
 window.addEventListener("error", event => {
   console.error(event.error || event.message);
   toast("🐻");
@@ -1217,7 +1455,7 @@ window.addEventListener("unhandledrejection", event => {
 });
 
 if ("serviceWorker" in navigator) {
-  window.addEventListener("load", () => navigator.serviceWorker.register("./service-worker.js?v=110").catch(console.warn));
+  window.addEventListener("load", () => navigator.serviceWorker.register("./service-worker.js?v=120").catch(console.warn));
 }
 
 render();

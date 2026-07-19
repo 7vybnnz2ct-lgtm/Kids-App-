@@ -1,7 +1,7 @@
 {
-  "name": "Bärenhaus – Bärflix & Musik",
+  "name": "Bärenhaus – Pausierbare Folgenzeit",
   "short_name": "Bärenhaus",
-  "description": "Private Familien-App mit Bärflix, Musik und optionaler Schatzkiste.",
+  "description": "Familien-App mit Bärflix, Musik und pausierbaren Folgen-Tickets.",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",

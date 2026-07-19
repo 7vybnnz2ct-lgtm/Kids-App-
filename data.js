@@ -1,4 +1,4 @@
-export const VERSION = "1.1.0";
+export const VERSION = "1.2.0";
 
 export const DEFAULT_SERIES = [
   {
@@ -7,9 +7,9 @@ export const DEFAULT_SERIES = [
     emoji: "🚙",
     source: "Nick Jr. Deutschland",
     episodes: [
-      { id: "blaze-party", title: "Blaze rettet die Party", youtubeId: "26iqSdpBVoI" },
-      { id: "blaze-diebin", title: "Blaze stellt die Diebin", youtubeId: "uPjeikJPATo" },
-      { id: "blaze-turm", title: "Der größte Turm", youtubeId: "ojuaxl8NaY8" }
+      { id: "blaze-mechanik", title: "Das Mechanik-Team – ganze Folge", youtubeId: "lNSyKLKNYxg", fullEpisode: true },
+      { id: "blaze-geschenk", title: "Das goldene Geschenk – ganze Folge", youtubeId: "xK7bCzjc_wc", fullEpisode: true },
+      { id: "blaze-turm", title: "Der größte Turm – ganze Folge", youtubeId: "ojuaxl8NaY8", fullEpisode: true }
     ]
   },
   {
@@ -18,31 +18,31 @@ export const DEFAULT_SERIES = [
     emoji: "🏎️",
     source: "Hot Wheels Deutsch",
     episodes: [
-      { id: "hot-pizza", title: "Das Rennen um 500 Pizzen", youtubeId: "KNYlz2JZgkw" },
-      { id: "hot-countdown", title: "Countdown zum großen Rennen", youtubeId: "9uFQ8siwxKY" },
-      { id: "hot-lenkrad", title: "Das Goldene Lenkrad", youtubeId: "7mJly7ehhJk" }
+      { id: "hot-pizza", title: "Das Rennen um 500 Pizzen – ganze Folge", youtubeId: "KNYlz2JZgkw", fullEpisode: true },
+      { id: "hot-countdown", title: "Countdown zum großen Rennen – ganze Folge", youtubeId: "9uFQ8siwxKY", fullEpisode: true },
+      { id: "hot-abenteuer", title: "Die verrücktesten Abenteuer – ganze Folgen", youtubeId: "zyoSy5fjNUI", fullEpisode: true }
     ]
   },
   {
     id: "feuerwehrmann-sam",
     title: "Feuerwehrmann Sam",
     emoji: "🚒",
-    source: "Feuerwehrmann Sam – offizieller Kanal",
+    source: "Feuerwehrmann Sam / KiKAninchen",
     episodes: [
-      { id: "sam-pfade", title: "Auf gefährlichen Pfaden", youtubeId: "QpxmwO75HwI" },
-      { id: "sam-retter", title: "Die jungen Retter", youtubeId: "vuFDwO_sg2M" },
-      { id: "sam-feuerwache", title: "Feuer in der Feuerwache", youtubeId: "ibcsuD-sKNg" }
+      { id: "sam-pfade", title: "Auf gefährlichen Pfaden – ganze Folge", youtubeId: "QpxmwO75HwI", fullEpisode: true },
+      { id: "sam-steinzeit", title: "Zurück in die Steinzeit – ganze Folge", youtubeId: "16cZNRhbxcM", fullEpisode: true },
+      { id: "sam-geschenk", title: "Das ganz besondere Geschenk – ganze Folge", youtubeId: "zydB88-PRTE", fullEpisode: true }
     ]
   },
   {
     id: "super-wings",
     title: "Super Wings",
     emoji: "✈️",
-    source: "TOGGO Serien",
+    source: "Super Wings Deutsch – offizieller TOGGO-Kanal",
     episodes: [
-      { id: "sw-flughafen", title: "Auf dem Weltflughafen", youtubeId: "Z86c7SagYk0" },
-      { id: "sw-wuensche", title: "Aktiviere Wunsch-Erfüller", youtubeId: "X4IhQE1omLI" },
-      { id: "sw-polizei", title: "Perfekte Polizeiarbeit", youtubeId: "fMdMIPBqL-g" }
+      { id: "sw-wal", title: "Jett und der Wal – ganze Folge", youtubeId: "TjOyEoaXGwc", fullEpisode: true },
+      { id: "sw-parcours", title: "Der Hindernisparcours – ganze Folge", youtubeId: "8WMBTVeZB_4", fullEpisode: true },
+      { id: "sw-mondkuchen", title: "Die Mondkuchen-Diebe – ganze Folge", youtubeId: "-mab3uU6hR8", fullEpisode: true }
     ]
   },
   {
@@ -51,9 +51,9 @@ export const DEFAULT_SERIES = [
     emoji: "🚂",
     source: "Thomas & seine Freunde Deutschland",
     episodes: [
-      { id: "thomas-chaos", title: "Alles wird chaotisch", youtubeId: "fTn9v2wZCuY" },
-      { id: "thomas-mitfahren", title: "Fahr mit Thomas mit", youtubeId: "YbtYL77L9gI" },
-      { id: "thomas-abenteuer", title: "Los geht’s ins Abenteuer", youtubeId: "r9Ii9iBShV0" }
+      { id: "thomas-schmutzig", title: "Bloß nicht schmutzig werden – ganze Folge", youtubeId: "9MXyH9kmX0Y", fullEpisode: true },
+      { id: "thomas-stafford", title: "Willkommen, Stafford – ganze Folge", youtubeId: "qf6lyq5RfUM", fullEpisode: true },
+      { id: "thomas-mief", title: "Miefs Traum – ganze Folge", youtubeId: "fZmiW7xJvS0", fullEpisode: true }
     ]
   },
   {
@@ -62,20 +62,9 @@ export const DEFAULT_SERIES = [
     emoji: "🔧",
     source: "Die Fixies – offizieller Kanal",
     episodes: [
-      { id: "fixies-hebel", title: "Der Hebel", youtubeId: "_o_x1oZgVB0" },
-      { id: "fixies-baby", title: "Das neue Baby", youtubeId: "pATfN2zIQwA" },
-      { id: "fixies-zug", title: "Elektrischer Zug", youtubeId: "1pKPHgQjTDg" }
-    ]
-  },
-  {
-    id: "tautropfen",
-    title: "Die Tautropfentagebücher",
-    emoji: "🧚",
-    source: "Netflix",
-    episodes: [
-      { id: "tau-zahnfee", title: "Unternehmen Zahnfee", youtubeId: "Z0pN9zu7qag" },
-      { id: "tau-sparschwein", title: "Sparschweinchenprobleme", youtubeId: "C5zu9tRD7N8" },
-      { id: "tau-brief", title: "Briefabenteuer", youtubeId: "TRdg_1vcqs4" }
+      { id: "fixies-hebel", title: "Der Hebel – ganze Folge", youtubeId: "_o_x1oZgVB0", fullEpisode: true },
+      { id: "fixies-kuehlschrank", title: "Der Kühlschrank – ganze Folge", youtubeId: "RaAby92dY5w", fullEpisode: true },
+      { id: "fixies-schloss", title: "Das Kombinationsschloss – ganze Folge", youtubeId: "kRlZ6cR5Nbg", fullEpisode: true }
     ]
   },
   {
@@ -84,9 +73,9 @@ export const DEFAULT_SERIES = [
     emoji: "🐰",
     source: "Bing Deutsch – offizieller Kanal",
     episodes: [
-      { id: "bing-zehn", title: "Zehn ganze Folgen", youtubeId: "EDib6rG13_E" },
-      { id: "bing-fuenf", title: "Fünf ganze Folgen", youtubeId: "vPbYyG-7SJ4" },
-      { id: "bing-neu", title: "Neue ganze Folgen", youtubeId: "7Hh_fh0owqQ" }
+      { id: "bing-ball", title: "Ball – ganze Folge", youtubeId: "HaBL4ATXIhA", fullEpisode: true },
+      { id: "bing-unfall", title: "Unfall – ganze Folge", youtubeId: "paQb5xdGUk0", fullEpisode: true },
+      { id: "bing-laden", title: "Der Laden – ganze Folge", youtubeId: "4VAdjtgl9wU", fullEpisode: true }
     ]
   },
   {
@@ -95,9 +84,9 @@ export const DEFAULT_SERIES = [
     emoji: "🐇",
     source: "Simon Super Hase – Deutsch",
     episodes: [
-      { id: "simon-fangen", title: "Spielen wir Fangen", youtubeId: "0CRJ_FUyD88" },
-      { id: "simon-fahrrad", title: "Tschüss, Stützräder", youtubeId: "BoiRw1_WOgg" },
-      { id: "simon-schwimmen", title: "Das Schwimmbecken", youtubeId: "8iGvF3k74wo" }
+      { id: "simon-fangen", title: "Spielen wir Fangen – ganze Folge", youtubeId: "0CRJ_FUyD88", fullEpisode: true },
+      { id: "simon-schnee", title: "Schneebälle und Geheimnisse – ganze Folge", youtubeId: "2r721776lVI", fullEpisode: true },
+      { id: "simon-champions", title: "Wir sind die Champions – ganze Folge", youtubeId: "jQiLAZUiOi0", fullEpisode: true }
     ]
   }
 ];
@@ -111,15 +100,6 @@ export const DEFAULT_MUSIC = [
   { id: "music-mix2", title: "Kinderlieder-Mix", artist: "Sing mit mir", youtubeId: "R3UwYHbStlc", emoji: "🎶" },
   { id: "music-mix3", title: "Laurentia und mehr", artist: "Sing mit mir", youtubeId: "bgBZasYs87I", emoji: "🌼" },
   { id: "music-gruen", title: "Grün, grün, grün", artist: "Sing mit mir", youtubeId: "AGrsasgsFuQ", emoji: "🟢" }
-];
-
-export const DEFAULT_TASKS = [
-  { id: "dress", title: "Anziehen", emoji: "👕" },
-  { id: "breakfast", title: "Frühstück", emoji: "🥣" },
-  { id: "teeth", title: "Zähne", emoji: "🪥" },
-  { id: "tidy", title: "Aufräumen", emoji: "🧸" },
-  { id: "bath", title: "Waschen", emoji: "🛁" },
-  { id: "sleep", title: "Schlafen", emoji: "🌙" }
 ];
 
 export const DEFAULT_REWARDS = [
