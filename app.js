@@ -6,8 +6,9 @@ import {
   STICKERS
 } from "./data.js";
 
-const KEY = "baerenhaus.v131";
+const KEY = "baerenhaus.v132";
 const LEGACY_KEYS = [
+  "baerenhaus.v131",
   "baerenhaus.v130",
   "baerenhaus.v122",
   "baerenhaus.v12",
@@ -1763,7 +1764,7 @@ window.addEventListener("pageshow", event => {
 });
 
 if ("serviceWorker" in navigator) {
-  window.addEventListener("load", () => navigator.serviceWorker.register("./service-worker.js?v=131").catch(console.warn));
+  window.addEventListener("load", () => navigator.serviceWorker.register("./service-worker.js?v=132").catch(console.warn));
 }
 
 render();

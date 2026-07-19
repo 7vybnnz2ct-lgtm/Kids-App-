@@ -1,7 +1,7 @@
 {
-  "name": "Bärenhaus – Premium 1.3.1",
+  "name": "Bärenhaus – Premium 1.3.2",
   "short_name": "Bärenhaus",
-  "description": "Premium-Familien-App mit Zeichentrick-Design, Avatar-Auswahl und pausierbaren Folgen-Tickets.",
+  "description": "Bärenhaus Premium 1.3.2 mit klareren Portalen ohne weiße Überblendungen.",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
