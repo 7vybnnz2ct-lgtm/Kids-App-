@@ -1,13 +1,13 @@
 {
-  "name": "Bärflix 8.0.1 Abenteuerwelten",
+  "name": "Bärflix 9.0 Stable",
   "short_name": "Bärflix",
-  "description": "Private kinderfreundliche Familien-Mediathek für Ludwig und Fabian",
+  "description": "Private Familien-Mediathek für Ludwig und Fabian",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
   "orientation": "any",
-  "background_color": "#8fd9f7",
-  "theme_color": "#55bde9",
+  "background_color": "#75d2f3",
+  "theme_color": "#62c4ed",
   "icons": [
     {
       "src": "./icons/icon.svg",
