@@ -1,0 +1,341 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#211914">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Bärflix">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>Bärflix</title>
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="apple-touch-icon" href="./icons/icon.svg">
+  <link rel="icon" href="./icons/icon.svg">
+  <style>
+    :root{
+      --bg:#211914;--panel:#30251f;--panel2:#3b2e27;--text:#fff8ec;--muted:#cbbdaf;
+      --gold:#f3c85b;--sage:#89b58d;--coral:#da7d68;--sky:#6fa9b4;--danger:#d95b5b;
+      --shadow:0 18px 50px rgba(0,0,0,.28);--radius:22px;
+    }
+    *{box-sizing:border-box}
+    html,body{margin:0;min-height:100%;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+    button,input,select{font:inherit}
+    button{cursor:pointer}
+    .app{min-height:100vh;padding:calc(16px + env(safe-area-inset-top)) 18px calc(24px + env(safe-area-inset-bottom))}
+    .topbar{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:18px}
+    .brand{display:flex;align-items:center;gap:12px}
+    .logo{font-size:42px}
+    .brand h1{font-size:34px;line-height:1;margin:0}
+    .brand small{color:var(--muted)}
+    .btn{border:0;border-radius:14px;padding:11px 15px;background:var(--panel2);color:var(--text);font-weight:700}
+    .btn.primary{background:var(--gold);color:#2d231d}
+    .btn.sage{background:var(--sage);color:#152016}
+    .btn.coral{background:var(--coral);color:#251510}
+    .btn.danger{background:var(--danger);color:white}
+    .btn.ghost{background:transparent;border:1px solid rgba(255,255,255,.16)}
+    .hero{background:linear-gradient(135deg,#3a2c24,#211914 70%);border-radius:28px;padding:26px;box-shadow:var(--shadow);display:flex;justify-content:space-between;align-items:center;gap:20px;margin-bottom:22px}
+    .hero h2{font-size:32px;margin:0 0 8px}.hero p{color:var(--muted);margin:0;max-width:650px}
+    .profiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px}
+    .profile{background:var(--panel);border-radius:22px;padding:20px;text-align:center;border:2px solid transparent;transition:.18s}
+    .profile:hover{transform:translateY(-2px);border-color:rgba(243,200,91,.6)}
+    .avatar{width:86px;height:86px;border-radius:50%;display:grid;place-items:center;margin:0 auto 12px;font-size:46px;background:#4a382e}
+    .profile h3{margin:0;font-size:23px}
+    .profile .sub{color:var(--muted);font-size:14px;margin-top:4px}
+    .chips{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px}
+    .chip{border:0;border-radius:22px;padding:20px;text-align:left;color:#1f1713;min-height:126px;box-shadow:var(--shadow)}
+    .chip b{font-size:22px;display:block}.chip span{display:block;margin-top:8px}
+    .chip.one{background:var(--gold)}.chip.two{background:var(--sage)}.chip.bonus{background:var(--sky)}
+    .chip.used{opacity:.35;filter:grayscale(.5);cursor:not-allowed}
+    .section-head{display:flex;align-items:end;justify-content:space-between;gap:12px;margin:26px 0 14px}
+    .section-head h2{margin:0;font-size:26px}.section-head p{margin:3px 0 0;color:var(--muted)}
+    .categories{display:flex;gap:10px;overflow:auto;padding-bottom:8px}
+    .cat{white-space:nowrap;border:0;border-radius:999px;padding:10px 15px;background:var(--panel2);color:var(--text)}
+    .cat.active{background:var(--gold);color:#2d231d;font-weight:800}
+    .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:18px}
+    .tile{background:var(--panel);border-radius:18px;overflow:hidden;box-shadow:var(--shadow);position:relative}
+    .thumb{aspect-ratio:16/9;background:#111;display:block;width:100%;object-fit:cover}
+    .tile-body{padding:14px}.tile h3{margin:0;font-size:18px}.tile .meta{color:var(--muted);font-size:13px;margin-top:6px}
+    .tile button.play{position:absolute;inset:0;border:0;background:transparent}
+    .empty{background:var(--panel);border-radius:20px;padding:28px;color:var(--muted);text-align:center}
+    .modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.72);display:grid;place-items:center;padding:20px;z-index:50}
+    .modal{width:min(760px,100%);max-height:90vh;overflow:auto;background:var(--panel);border-radius:24px;padding:22px;box-shadow:var(--shadow)}
+    .modal h2{margin-top:0}.form{display:grid;gap:14px}.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    label{display:grid;gap:7px;color:var(--muted);font-size:14px}
+    input,select{width:100%;border:1px solid rgba(255,255,255,.15);border-radius:12px;background:#211914;color:var(--text);padding:12px}
+    .actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px}
+    .admin-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}
+    .card{background:var(--panel2);border-radius:18px;padding:16px}.card h3{margin:0 0 10px}
+    .admin-list{display:grid;gap:10px}.admin-item{display:flex;justify-content:space-between;gap:12px;align-items:center;background:#241b17;border-radius:14px;padding:12px}
+    .player-screen{position:fixed;inset:0;background:#000;z-index:80;display:flex;flex-direction:column;padding:calc(10px + env(safe-area-inset-top)) 12px calc(10px + env(safe-area-inset-bottom));gap:10px}
+    .player-top{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+    .player-wrap{flex:1;min-height:0;display:grid;place-items:center}
+    #ytplayer,.player-wrap iframe{width:100%!important;height:100%!important;border:0}
+    .timer{background:var(--gold);color:#231a15;border-radius:999px;padding:9px 14px;font-weight:900}
+    .toast{position:fixed;left:50%;bottom:calc(22px + env(safe-area-inset-bottom));transform:translateX(-50%);background:#fff;color:#241b17;padding:12px 16px;border-radius:14px;z-index:100;box-shadow:var(--shadow)}
+    .hidden{display:none!important}
+    @media(max-width:650px){.hero{padding:20px}.hero h2{font-size:26px}.row{grid-template-columns:1fr}.grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.tile h3{font-size:15px}.brand h1{font-size:29px}}
+  </style>
+</head>
+<body>
+<div id="app"></div>
+<script src="https://www.youtube.com/iframe_api"></script>
+<script>
+const APP_KEY='baerflix.v2';
+const state={
+  data:null,screen:'profiles',kidId:null,allowance:null,category:'Alle',player:null,timer:null,lastTick:null
+};
+
+const defaults={
+  version:2,
+  settings:{minutesPerEpisode:12,pinHash:'',pinSalt:'',appLock:false},
+  kids:[],
+  categories:['Serien','Fahrzeuge','Tiere','Musik','Einschlafen'],
+  videos:[],
+  chipStates:{}
+};
+
+function uid(){return crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(36)+Math.random().toString(36).slice(2)}
+function today(){return new Date().toISOString().slice(0,10)}
+function clone(v){return JSON.parse(JSON.stringify(v))}
+function load(){
+  try{state.data={...clone(defaults),...JSON.parse(localStorage.getItem(APP_KEY)||'{}')}}
+  catch{state.data=clone(defaults)}
+  state.data.settings={...defaults.settings,...(state.data.settings||{})}
+  state.data.kids=state.data.kids||[]; state.data.videos=state.data.videos||[];
+  state.data.categories=state.data.categories?.length?state.data.categories:clone(defaults.categories);
+  state.data.chipStates=state.data.chipStates||{};
+}
+function save(){localStorage.setItem(APP_KEY,JSON.stringify(state.data))}
+function qs(s){return document.querySelector(s)}
+function esc(s=''){return s.replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
+function videoId(url){
+  const m=String(url).match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|shorts\/))([A-Za-z0-9_-]{6,})/);
+  return m?m[1]:String(url).trim();
+}
+function thumb(id){return `https://i.ytimg.com/vi/${id}/hqdefault.jpg`}
+function chipState(kidId){
+  let cs=state.data.chipStates[kidId];
+  if(!cs||cs.date!==today()){
+    const bonus=cs?.bonus||0;
+    cs={date:today(),used:{one1:false,one2:false,two:false},bonus,pending:null};
+    state.data.chipStates[kidId]=cs;save();
+  }
+  return cs;
+}
+function fmt(sec){sec=Math.max(0,Math.round(sec));return `${String(Math.floor(sec/60)).padStart(2,'0')}:${String(sec%60).padStart(2,'0')}`}
+function toast(msg){const d=document.createElement('div');d.className='toast';d.textContent=msg;document.body.appendChild(d);setTimeout(()=>d.remove(),2600)}
+
+async function hashPin(pin,saltB64){
+  const enc=new TextEncoder(); const salt=saltB64?Uint8Array.from(atob(saltB64),c=>c.charCodeAt(0)):crypto.getRandomValues(new Uint8Array(16));
+  const key=await crypto.subtle.importKey('raw',enc.encode(pin),'PBKDF2',false,['deriveBits']);
+  const bits=await crypto.subtle.deriveBits({name:'PBKDF2',salt,iterations:150000,hash:'SHA-256'},key,256);
+  return {hash:btoa(String.fromCharCode(...new Uint8Array(bits))),salt:btoa(String.fromCharCode(...salt))};
+}
+async function checkPin(pin){
+  if(!state.data.settings.pinHash)return true;
+  const r=await hashPin(pin,state.data.settings.pinSalt);
+  return r.hash===state.data.settings.pinHash;
+}
+
+function shell(content){
+  return `<div class="app">
+    <div class="topbar">
+      <div class="brand"><div class="logo">🐻</div><div><h1>Bärflix</h1><small>Unser Familienkino</small></div></div>
+      <button class="btn ghost" id="parentBtn">Elternbereich</button>
+    </div>${content}</div>`;
+}
+
+function render(){
+  destroyPlayer(false);
+  if(state.screen==='profiles')renderProfiles();
+  if(state.screen==='chips')renderChips();
+  if(state.screen==='library')renderLibrary();
+}
+function bindParent(){qs('#parentBtn')?.addEventListener('click',openParentLogin)}
+
+function renderProfiles(){
+  const cards=state.data.kids.map(k=>`<button class="profile" data-kid="${k.id}">
+    <div class="avatar">${esc(k.avatar||'🐻')}</div><h3>${esc(k.name)}</h3><div class="sub">Profil öffnen</div>
+  </button>`).join('');
+  qs('#app').innerHTML=shell(`
+    <section class="hero"><div><h2>Wer schaut heute?</h2><p>Wähle ein Kinderprofil. Danach wird ein Chip ausgesucht und nur freigegebene Inhalte erscheinen.</p></div><div style="font-size:70px">🍿</div></section>
+    <div class="profiles">${cards||`<div class="empty">Noch kein Kinderprofil vorhanden. Öffne den Elternbereich und lege das erste Profil an.</div>`}</div>`);
+  bindParent();
+  document.querySelectorAll('[data-kid]').forEach(b=>b.onclick=()=>{state.kidId=b.dataset.kid;state.screen='chips';render()});
+}
+
+function renderChips(){
+  const kid=state.data.kids.find(k=>k.id===state.kidId); if(!kid){state.screen='profiles';return render()}
+  const cs=chipState(kid.id), m=state.data.settings.minutesPerEpisode;
+  const c=(key,label,min,klass)=>`<button class="chip ${klass} ${cs.used[key]?'used':''}" data-chip="${key}" data-min="${min}" ${cs.used[key]?'disabled':''}><b>${label}</b><span>${min} Minuten</span></button>`;
+  qs('#app').innerHTML=shell(`
+    <button class="btn ghost" id="back">← Profile</button>
+    <section class="hero"><div><h2>${esc(kid.name)}, welchen Chip möchtest du?</h2><p>Die Zeit läuft nur, während das Video wirklich abgespielt wird.</p></div><div style="font-size:64px">${esc(kid.avatar||'🐻')}</div></section>
+    <div class="chips">
+      ${c('one1','⭐ Eine Folge',m,'one')}
+      ${c('one2','⭐ Eine Folge',m,'one')}
+      ${c('two','⭐⭐ Zwei Folgen',m*2,'two')}
+      <button class="chip bonus ${cs.bonus<1?'used':''}" data-chip="bonus" data-min="${m}" ${cs.bonus<1?'disabled':''}><b>🌈 Bonuschip</b><span>${cs.bonus} verfügbar · ${m} Minuten</span></button>
+    </div>`);
+  bindParent();qs('#back').onclick=()=>{state.screen='profiles';render()};
+  document.querySelectorAll('[data-chip]').forEach(b=>b.onclick=()=>{
+    state.allowance={type:b.dataset.chip,remaining:Number(b.dataset.min)*60};
+    state.screen='library';render();
+  });
+}
+
+function renderLibrary(){
+  const kid=state.data.kids.find(k=>k.id===state.kidId);if(!kid||!state.allowance){state.screen='chips';return render()}
+  const cats=['Alle',...state.data.categories];
+  const list=state.data.videos.filter(v=>state.category==='Alle'||v.category===state.category);
+  qs('#app').innerHTML=shell(`
+    <button class="btn ghost" id="back">← Chips</button>
+    <div class="section-head"><div><h2>Was möchtest du schauen?</h2><p>${esc(kid.name)} · ${fmt(state.allowance.remaining)} verfügbar</p></div><button class="btn sage" id="surprise">🎲 Überrasch mich</button></div>
+    <div class="categories">${cats.map(c=>`<button class="cat ${c===state.category?'active':''}" data-cat="${esc(c)}">${esc(c)}</button>`).join('')}</div>
+    <div class="grid">${list.map(v=>`<article class="tile">
+      <img class="thumb" src="${thumb(v.youtubeId)}" alt="">
+      <div class="tile-body"><h3>${esc(v.title)}</h3><div class="meta">${esc(v.category||'Video')}</div></div>
+      <button class="play" aria-label="${esc(v.title)} abspielen" data-play="${v.id}"></button>
+    </article>`).join('')||`<div class="empty">In dieser Kategorie sind noch keine Videos freigegeben.</div>`}</div>`);
+  bindParent();qs('#back').onclick=()=>{state.screen='chips';state.allowance=null;render()};
+  document.querySelectorAll('[data-cat]').forEach(b=>b.onclick=()=>{state.category=b.dataset.cat;renderLibrary()});
+  document.querySelectorAll('[data-play]').forEach(b=>b.onclick=()=>startVideo(b.dataset.play));
+  qs('#surprise').onclick=()=>{if(list.length)startVideo(list[Math.floor(Math.random()*list.length)].id)};
+}
+
+function startVideo(id){
+  const v=state.data.videos.find(x=>x.id===id);if(!v)return;
+  document.body.insertAdjacentHTML('beforeend',`<div class="player-screen" id="playerScreen">
+    <div class="player-top"><button class="btn ghost" id="closePlayer">← Zurück</button><div class="timer" id="timer">${fmt(state.allowance.remaining)}</div><button class="btn primary" id="full">⛶ Vollbild</button></div>
+    <div class="player-wrap"><div id="ytplayer"></div></div></div>`);
+  qs('#closePlayer').onclick=()=>destroyPlayer(true);
+  qs('#full').onclick=()=>{const el=state.player?.getIframe?.()||qs('.player-wrap');(el.requestFullscreen||el.webkitRequestFullscreen||(()=>{})).call(el)};
+  const make=()=>state.player=new YT.Player('ytplayer',{
+    videoId:v.youtubeId,playerVars:{autoplay:1,playsinline:1,rel:0,modestbranding:1,origin:location.origin},
+    events:{onStateChange:onPlayerState,onError:e=>toast(e.data===153?'YouTube blockiert diesen Player. Bitte die veröffentlichte HTTPS-Seite öffnen.':'Dieses Video kann möglicherweise nicht eingebettet werden.')}
+  });
+  if(window.YT&&YT.Player)make();else window.onYouTubeIframeAPIReady=make;
+}
+function onPlayerState(e){
+  if(e.data===YT.PlayerState.PLAYING){
+    state.lastTick=Date.now();
+    clearInterval(state.timer);
+    state.timer=setInterval(()=>{
+      const now=Date.now();state.allowance.remaining-=Math.max(0,(now-state.lastTick)/1000);state.lastTick=now;
+      const t=qs('#timer');if(t)t.textContent=fmt(state.allowance.remaining);
+      if(state.allowance.remaining<=0){finishAllowance()}
+    },500);
+  }else{clearInterval(state.timer);state.timer=null;state.lastTick=null}
+}
+function finishAllowance(){
+  clearInterval(state.timer);state.timer=null;
+  const cs=chipState(state.kidId);
+  if(state.allowance.type==='bonus')cs.bonus=Math.max(0,cs.bonus-1);else cs.used[state.allowance.type]=true;
+  cs.pending=null;save();
+  try{state.player?.pauseVideo()}catch{}
+  alert('Die Bärflix-Zeit ist für diesen Chip abgelaufen. Bitte Mama oder Papa fragen.');
+  destroyPlayer(false);state.allowance=null;state.screen='chips';render();
+}
+function destroyPlayer(returnToLibrary=true){
+  clearInterval(state.timer);state.timer=null;state.lastTick=null;
+  try{state.player?.destroy()}catch{} state.player=null;
+  qs('#playerScreen')?.remove();
+  if(returnToLibrary&&state.screen==='library')renderLibrary();
+}
+
+async function openParentLogin(){
+  document.body.insertAdjacentHTML('beforeend',`<div class="modal-backdrop" id="modal"><div class="modal"><h2>Elternbereich</h2>
+    <div class="form"><label>PIN<input id="pinInput" type="password" inputmode="numeric" autocomplete="off"></label></div>
+    <div class="actions"><button class="btn primary" id="login">Öffnen</button><button class="btn ghost" id="cancel">Abbrechen</button></div></div></div>`);
+  qs('#cancel').onclick=closeModal;qs('#login').onclick=async()=>{if(await checkPin(qs('#pinInput').value)){closeModal();renderAdmin()}else toast('PIN nicht korrekt')};
+}
+function closeModal(){qs('#modal')?.remove()}
+
+function renderAdmin(){
+  const kidRows=state.data.kids.map(k=>`<div class="admin-item"><span>${esc(k.avatar||'🐻')} <b>${esc(k.name)}</b></span><span>
+    <button class="btn" data-bonus="${k.id}">+ Bonus</button>
+    <button class="btn" data-reset="${k.id}">Chips zurücksetzen</button>
+    <button class="btn danger" data-del-kid="${k.id}">Löschen</button></span></div>`).join('');
+  const videoRows=state.data.videos.map(v=>`<div class="admin-item"><span><b>${esc(v.title)}</b><br><small>${esc(v.category||'')}</small></span><button class="btn danger" data-del-video="${v.id}">Löschen</button></div>`).join('');
+  document.body.insertAdjacentHTML('beforeend',`<div class="modal-backdrop" id="modal"><div class="modal">
+    <div class="section-head"><div><h2>Elternbereich</h2><p>Alle Angaben bleiben lokal auf diesem Gerät.</p></div><button class="btn ghost" id="cancel">Schließen</button></div>
+    <div class="admin-grid">
+      <section class="card"><h3>👧 Kinderprofile</h3><div class="admin-list">${kidRows||'<small>Noch keine Profile</small>'}</div>
+        <div class="actions"><button class="btn primary" id="addKid">Kind hinzufügen</button></div></section>
+      <section class="card"><h3>📺 Videokacheln</h3><div class="admin-list">${videoRows||'<small>Noch keine Videos</small>'}</div>
+        <div class="actions"><button class="btn primary" id="addVideo">Video hinzufügen</button></div></section>
+      <section class="card"><h3>⚙️ Einstellungen</h3>
+        <div class="form"><label>Minuten pro Folge<input id="minutes" type="number" min="1" max="120" value="${state.data.settings.minutesPerEpisode}"></label>
+        <label>Neue Eltern-PIN<input id="newPin" type="password" inputmode="numeric" placeholder="leer lassen = unverändert"></label></div>
+        <div class="actions"><button class="btn sage" id="saveSettings">Speichern</button></div></section>
+      <section class="card"><h3>💾 Backup</h3><p style="color:var(--muted)">Exportiere alle Profile, Videos, Chips und Einstellungen verschlüsselt.</p>
+        <div class="actions"><button class="btn" id="export">Backup exportieren</button><label class="btn">Backup importieren<input id="import" type="file" accept=".baerflix,.json" hidden></label></div></section>
+    </div>
+  </div></div>`);
+  qs('#cancel').onclick=closeModal;
+  qs('#addKid').onclick=showAddKid;qs('#addVideo').onclick=showAddVideo;
+  document.querySelectorAll('[data-reset]').forEach(b=>b.onclick=()=>{const cs=chipState(b.dataset.reset);cs.used={one1:false,one2:false,two:false};cs.pending=null;save();toast('Tageschips zurückgesetzt')});
+  document.querySelectorAll('[data-bonus]').forEach(b=>b.onclick=()=>{chipState(b.dataset.bonus).bonus++;save();toast('Bonuschip hinzugefügt')});
+  document.querySelectorAll('[data-del-kid]').forEach(b=>b.onclick=()=>{if(confirm('Profil wirklich löschen?')){state.data.kids=state.data.kids.filter(k=>k.id!==b.dataset.delKid);delete state.data.chipStates[b.dataset.delKid];save();closeModal();renderAdmin()}});
+  document.querySelectorAll('[data-del-video]').forEach(b=>b.onclick=()=>{state.data.videos=state.data.videos.filter(v=>v.id!==b.dataset.delVideo);save();closeModal();renderAdmin()});
+  qs('#saveSettings').onclick=async()=>{
+    state.data.settings.minutesPerEpisode=Math.max(1,Number(qs('#minutes').value)||12);
+    const p=qs('#newPin').value;
+    if(p){const r=await hashPin(p);state.data.settings.pinHash=r.hash;state.data.settings.pinSalt=r.salt}
+    save();toast('Einstellungen gespeichert')
+  };
+  qs('#export').onclick=exportBackup;qs('#import').onchange=importBackup;
+}
+function showAddKid(){
+  closeModal();document.body.insertAdjacentHTML('beforeend',`<div class="modal-backdrop" id="modal"><div class="modal"><h2>Kind hinzufügen</h2><div class="form">
+    <label>Name<input id="kidName"></label><label>Avatar<select id="kidAvatar"><option>🐻</option><option>🦊</option><option>🐼</option><option>🦁</option><option>🐯</option><option>🐨</option></select></label></div>
+    <div class="actions"><button class="btn primary" id="saveKid">Speichern</button><button class="btn ghost" id="cancel">Abbrechen</button></div></div></div>`);
+  qs('#cancel').onclick=()=>{closeModal();renderAdmin()};qs('#saveKid').onclick=()=>{const name=qs('#kidName').value.trim();if(!name)return toast('Bitte Namen eingeben');state.data.kids.push({id:uid(),name,avatar:qs('#kidAvatar').value});save();closeModal();renderAdmin()}
+}
+function showAddVideo(){
+  closeModal();document.body.insertAdjacentHTML('beforeend',`<div class="modal-backdrop" id="modal"><div class="modal"><h2>Videokachel hinzufügen</h2><div class="form">
+    <label>YouTube-Link<input id="videoUrl" placeholder="https://youtu.be/..."></label>
+    <label>Titel<input id="videoTitle" placeholder="z. B. Feuerwehr Sam"></label>
+    <label>Kategorie<select id="videoCategory">${state.data.categories.map(c=>`<option>${esc(c)}</option>`).join('')}</select></label>
+    </div><div class="actions"><button class="btn primary" id="saveVideo">Kachel speichern</button><button class="btn ghost" id="cancel">Abbrechen</button></div></div></div>`);
+  qs('#cancel').onclick=()=>{closeModal();renderAdmin()};
+  qs('#videoUrl').onchange=async()=>{
+    const id=videoId(qs('#videoUrl').value);if(!id)return;
+    try{const r=await fetch(`https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v=${id}&format=json`);if(r.ok){const d=await r.json();if(!qs('#videoTitle').value)qs('#videoTitle').value=d.title||''}}catch{}
+  };
+  qs('#saveVideo').onclick=()=>{
+    const youtubeId=videoId(qs('#videoUrl').value),title=qs('#videoTitle').value.trim();
+    if(!youtubeId||!title)return toast('Bitte Link und Titel eingeben');
+    state.data.videos.push({id:uid(),youtubeId,title,category:qs('#videoCategory').value});save();closeModal();renderAdmin()
+  }
+}
+
+async function deriveBackupKey(password,salt){
+  const raw=await crypto.subtle.importKey('raw',new TextEncoder().encode(password),'PBKDF2',false,['deriveKey']);
+  return crypto.subtle.deriveKey({name:'PBKDF2',salt,iterations:180000,hash:'SHA-256'},raw,{name:'AES-GCM',length:256},false,['encrypt','decrypt']);
+}
+async function exportBackup(){
+  const password=prompt('Passwort für das verschlüsselte Backup festlegen:');if(!password)return;
+  const salt=crypto.getRandomValues(new Uint8Array(16)),iv=crypto.getRandomValues(new Uint8Array(12));
+  const key=await deriveBackupKey(password,salt);
+  const cipher=await crypto.subtle.encrypt({name:'AES-GCM',iv},key,new TextEncoder().encode(JSON.stringify(state.data)));
+  const payload={v:1,salt:btoa(String.fromCharCode(...salt)),iv:btoa(String.fromCharCode(...iv)),data:btoa(String.fromCharCode(...new Uint8Array(cipher)))};
+  const blob=new Blob([JSON.stringify(payload)],{type:'application/json'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`baerflix-backup-${today()}.baerflix`;a.click();URL.revokeObjectURL(a.href)
+}
+async function importBackup(e){
+  const file=e.target.files[0];if(!file)return;
+  const password=prompt('Backup-Passwort eingeben:');if(!password)return;
+  try{
+    const p=JSON.parse(await file.text()),salt=Uint8Array.from(atob(p.salt),c=>c.charCodeAt(0)),iv=Uint8Array.from(atob(p.iv),c=>c.charCodeAt(0)),cipher=Uint8Array.from(atob(p.data),c=>c.charCodeAt(0));
+    const key=await deriveBackupKey(password,salt),plain=await crypto.subtle.decrypt({name:'AES-GCM',iv},key,cipher);
+    state.data=JSON.parse(new TextDecoder().decode(plain));save();closeModal();state.screen='profiles';render();toast('Backup wiederhergestellt')
+  }catch{toast('Backup oder Passwort nicht korrekt')}
+}
+
+load();render();
+if('serviceWorker' in navigator&&location.protocol.startsWith('http'))window.addEventListener('load',()=>navigator.serviceWorker.register('./service-worker.js').catch(()=>{}));
+</script>
+</body>
+</html>
