@@ -3,9 +3,9 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#1c1512">
+<meta name="theme-color" content="#bfe9ff">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="Bärflix">
 <title>Bärflix</title>
 <link rel="manifest" href="./manifest.webmanifest">
@@ -98,6 +98,75 @@ input,select,textarea{width:100%;border:1px solid var(--line);border-radius:13px
   .formGrid{grid-template-columns:1fr}.carousel{grid-template-columns:repeat(2,minmax(0,1fr));gap:11px}.episodeGrid{grid-template-columns:repeat(2,minmax(0,1fr));gap:11px}.cardBody{padding:11px}.cardBody h3,.cardBody h4{font-size:15px}
 }
 @media(max-width:470px){.carousel,.episodeGrid{grid-template-columns:1fr 1fr}.kidNav button{font-size:15px;min-height:82px}.kidNav span{font-size:29px}.adminSide{grid-template-columns:1fr 1fr}}
+
+/* BÄRFLIX 6.0 – freundliche Baumhauswelt */
+:root{
+  --bg:#c9efff;--panel:#ffffff;--panel2:#f7fcff;--panel3:#e8f7ff;
+  --text:#263746;--muted:#688092;--gold:#ffd65c;--mint:#9be0b5;
+  --coral:#ff9f91;--blue:#89d2f1;--danger:#e96f78;--line:rgba(47,95,122,.14);
+  --shadow:0 14px 35px rgba(57,118,148,.16);--r:28px;
+}
+html,body{
+  background:
+    radial-gradient(circle at 12% 12%,rgba(255,255,255,.95) 0 50px,transparent 52px),
+    radial-gradient(circle at 19% 14%,rgba(255,255,255,.9) 0 70px,transparent 72px),
+    radial-gradient(circle at 88% 18%,rgba(255,255,255,.9) 0 58px,transparent 60px),
+    linear-gradient(180deg,#aee4fb 0%,#dff7ff 62%,#d8f2c9 63%,#a8d99a 100%);
+  background-attachment:fixed;color:var(--text)
+}
+.app:before,.app:after{content:"";position:fixed;z-index:-1;border-radius:50%;pointer-events:none}
+.app:before{width:150px;height:150px;right:5vw;top:8vh;background:#ffe680;box-shadow:0 0 50px rgba(255,224,105,.55)}
+.app:after{width:440px;height:180px;left:-90px;bottom:-95px;background:#75bd72;box-shadow:420px 28px 0 #8ccd84,840px -8px 0 #71ba70}
+.topbar{background:rgba(255,255,255,.72);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,.7);padding:10px 14px;border-radius:24px;box-shadow:var(--shadow)}
+.brand small{display:none}.brand h1{font-size:31px;color:#315b70}.logo{filter:none}
+.btn{background:#fff;color:var(--text);box-shadow:0 7px 18px rgba(64,118,143,.12)}
+.btn.ghost{background:rgba(255,255,255,.78);border:1px solid rgba(255,255,255,.85)}
+.hero{background:rgba(255,255,255,.83);color:var(--text);border:2px solid rgba(255,255,255,.8)}
+.hero p{color:var(--muted)}
+.profileGrid{max-width:760px;margin:34px auto}
+.profileCard{background:rgba(255,255,255,.9);border:4px solid rgba(255,255,255,.9);min-height:260px;display:grid;place-items:center}
+.profileCard:hover{border-color:var(--gold)}
+.avatar{width:140px;height:140px;font-size:76px;background:#eefaff}
+.profileCard h3{font-size:31px}
+.profileCard .muted{display:none}
+.ticketGrid{max-width:920px;margin:30px auto;grid-template-columns:repeat(2,minmax(230px,1fr))}
+.ticketChoice{min-height:240px;border:6px solid rgba(255,255,255,.72)}
+.ticketChoice strong{font-size:54px}.ticketChoice small{display:none}.ticketVisual{font-size:90px}
+.kidHint{display:none}
+.collectionCard,.episodeCard{background:#fff;border:4px solid rgba(255,255,255,.8);border-radius:30px}
+.collectionCard:hover,.episodeCard:hover{transform:scale(1.025)}
+.cover{border-radius:25px 25px 0 0}
+.cardBody{text-align:center;padding:16px}.cardBody h3{font-size:24px}.cardBody p{display:none}
+.badge{display:none}
+.favoriteBtn{background:#fff;color:#e6aa18}
+.kidNav{max-width:780px;margin:20px auto}
+.kidNav button{background:#fff;color:var(--text);box-shadow:var(--shadow);min-height:108px}
+.kidNav button.active{background:var(--gold)}
+.searchbar,.categoryRow{display:none}
+.sectionHead{justify-content:center;text-align:center}.sectionHead p{font-size:22px}
+.shelfTitle{justify-content:center}.shelfTitle h3{font-size:28px}
+.carousel,.episodeGrid{grid-template-columns:repeat(auto-fill,minmax(250px,1fr))}
+.breadcrumb .muted{display:none}
+.empty,.movieEmpty{background:rgba(255,255,255,.82)}
+.introScreen{background:linear-gradient(180deg,#9edffc 0%,#e5f8ff 68%,#a8da96 69%,#78bd72 100%)}
+.introTitle{color:#315b70;text-shadow:0 7px 0 rgba(255,255,255,.8)}
+.introSub{display:none}.introBear{filter:drop-shadow(0 18px 18px rgba(42,98,122,.2))}
+.spark{font-size:42px}
+.allowanceBadge{background:#fff;color:#315b70}.playerProgress{background:#dceef6}.playerProgressFill{background:var(--gold)}
+/* Elternbereich bewusst ruhig und sachlich */
+.modalBack{background:rgba(37,63,77,.68)}
+.modal{background:#f7fbfd;color:#263746}
+.modal input,.modal select,.modal textarea{background:#fff;color:#263746}
+.modal .panel,.modal .listItem,.modal .stat{background:#eaf5fa}
+.adminSide .btn{box-shadow:none}
+@media(max-width:650px){
+  .ticketGrid{grid-template-columns:1fr 1fr;gap:12px}
+  .ticketChoice{min-height:180px;padding:10px}.ticketVisual{font-size:62px}.ticketChoice strong{font-size:42px}
+  .profileGrid{grid-template-columns:1fr 1fr}.profileCard{min-height:210px;padding:14px}.avatar{width:110px;height:110px;font-size:62px}
+  .carousel,.episodeGrid{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+  .cardBody h3,.cardBody h4{font-size:17px}
+}
+
 </style>
 </head>
 <body>
@@ -105,8 +174,8 @@ input,select,textarea{width:100%;border:1px solid var(--line);border-radius:13px
 <div id="app"></div>
 <script>
 (()=>{"use strict";
-const APP_VERSION="5.1.0";
-const KEY="baerflix.complete.v5.1";
+const APP_VERSION="6.0.0";
+const KEY="baerflix.complete.v6";
 const $=(s,r=document)=>r.querySelector(s);
 const esc=s=>String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[m]));
 const uid=()=>crypto.randomUUID?crypto.randomUUID():Date.now()+"-"+Math.random();
@@ -177,7 +246,7 @@ async function hashPin(pin,saltB64){
 function showToast(t){clearTimeout(toastTimer);let el=$("#toast");if(!el){el=document.createElement("div");el.id="toast";el.className="toast";document.body.appendChild(el)}el.textContent=t;toastTimer=setTimeout(()=>el.remove(),2600)}
 function shell(content){
   const update=state.settings.updateVersion!==APP_VERSION?`<div class="updateBanner"><span>Eine neue Bärflix-Version ist verfügbar.</span><button class="btn" data-act="reload">Neu laden</button></div>`:"";
-  return `<div class="app"><div class="wrap">${update}<header class="topbar"><div class="brand"><div class="logo">🐻</div><div><h1>Bärflix</h1><small>Unser Familienkino · v${APP_VERSION}</small></div></div>${screen!=="setup"?'<button class="btn ghost" data-act="login">Elternbereich</button>':""}</header><main>${content}</main></div></div>`
+  return `<div class="app"><div class="wrap">${update}<header class="topbar"><div class="brand"><div class="logo">🐻</div><div><h1>Bärflix</h1></div></div>${screen!=="setup"?'<button class="btn ghost" data-act="login" aria-label="Elternbereich">🔒</button>':""}</header><main>${content}</main></div></div>`
 }
 function hero(title,text,emoji){return `<section class="hero"><div><h2>${esc(title)}</h2><p>${esc(text)}</p></div><div class="heroEmoji">${emoji}</div></section>`}
 function render(){
@@ -192,7 +261,7 @@ function render(){
 }
 function introView(){return `<div class="introScreen" data-act="skipIntro" aria-label="Bärflix startet">
   <div class="spark s1">⭐</div><div class="spark s2">✨</div><div class="spark s3">⭐</div><div class="spark s4">✨</div>
-  <div class="introInner"><div class="introBear">🐻</div><div class="introTitle">Bärflix</div><div class="introSub">Unser Familienkino</div></div>
+  <div class="introInner"><div class="introBear">🐻</div><div class="introTitle">Bärflix</div></div>
 </div>`}
 function setupView(){
   return `<div class="setup">${hero("Willkommen bei Bärflix","Lege Eltern-PIN und erstes Kinderprofil an.","🐻🍿")}
@@ -206,24 +275,22 @@ function setupView(){
   <div class="actions"><button class="btn primary" data-act="setupSave">Bärflix starten</button></div></div></div>`
 }
 function profilesView(){
-  return `${hero("Wer schaut heute?","Wähle ein Profil. Danach suchst du einen Chip aus.","🍿")}
-  <div class="sectionHead"><div><h2>Profile</h2><p>Einfach antippen</p></div></div>
-  <div class="profileGrid">${state.kids.map(k=>`<button class="profileCard" data-kid="${k.id}" style="border-color:${k.color}55"><div class="avatar" style="background:${k.color}33">${k.avatar}</div><h3>${esc(k.name)}</h3><div class="muted">Antippen und los geht’s</div></button>`).join("")}</div>`
+  return `<div class="sectionHead"><div><h2>👋</h2></div></div>
+  <div class="profileGrid">${state.kids.map(k=>`<button class="profileCard" data-kid="${k.id}" style="border-color:${k.color}88"><div class="avatar" style="background:${k.color}44">${k.avatar}</div><h3>${esc(k.name)}</h3></button>`).join("")}</div>`
 }
 function chipsView(){
   const c=chipState(selectedKid.id),m=minutesFor(selectedKid);
-  const ticket=(key,count,cls,label,disabled=false)=>`<button class="ticketChoice ${cls} ${disabled?"used":""}" data-chip="${key}" data-min="${m*count}" ${disabled?"disabled":""}>
-    <div><div class="ticketVisual">${"🎟️".repeat(count)}</div><strong>${count}</strong><small>${label}</small></div>
+  const ticket=(key,count,cls,disabled=false)=>`<button class="ticketChoice ${cls} ${disabled?"used":""}" data-chip="${key}" data-min="${m*count}" ${disabled?"disabled":""} aria-label="${count} Ticket">
+    <div><div class="ticketVisual">${"🎟️".repeat(count)}</div><strong>${count}</strong></div>
   </button>`;
-  return `<button class="btn ghost bigBack" data-act="profiles">← Zurück</button>
-  ${hero(`${selectedKid.name}, such dir ein Ticket aus!`,"Ein Ticket bedeutet: eine Folge anschauen.",selectedKid.avatar)}
-  <div class="kidHint">Wie viele Folgen möchtest du schauen?</div>
+  return `<button class="btn ghost bigBack" data-act="profiles" aria-label="Zurück">←</button>
+  <div class="sectionHead"><div><h2>${selectedKid.avatar}</h2></div></div>
   <div class="ticketGrid">
-    ${ticket("one1",1,"one","Eine Folge",c.used.one1)}
-    ${ticket("one2",1,"one","Eine Folge",c.used.one2)}
-    ${ticket("two",2,"two","Zwei Folgen",c.used.two)}
-    <button class="ticketChoice bonus ${c.bonus<1?"used":""}" data-chip="bonus" data-min="${m}" ${c.bonus<1?"disabled":""}>
-      <div><div class="ticketVisual">🌈🎟️</div><strong>${c.bonus}</strong><small>Bonusticket</small></div>
+    ${ticket("one1",1,"one",c.used.one1)}
+    ${ticket("one2",1,"one",c.used.one2)}
+    ${ticket("two",2,"two",c.used.two)}
+    <button class="ticketChoice bonus ${c.bonus<1?"used":""}" data-chip="bonus" data-min="${m}" ${c.bonus<1?"disabled":""} aria-label="Bonusticket">
+      <div><div class="ticketVisual">🌈🎟️</div><strong>${c.bonus}</strong></div>
     </button>
   </div>`
 }
@@ -234,25 +301,27 @@ function filteredEpisodes(){
   return allEpisodes().filter(e=>(activeCategory==="Alle"||e.category===activeCategory)&&(!q||e.title.toLowerCase().includes(q)||e.collectionTitle.toLowerCase().includes(q)))
 }
 function libraryView(){
-  const cats=["Alle",...categories()],cols=visibleCollections().filter(c=>(activeCategory==="Alle"||c.category===activeCategory)&&(!searchText||c.title.toLowerCase().includes(searchText.toLowerCase())||c.episodes.some(e=>e.title.toLowerCase().includes(searchText.toLowerCase()))));
+  const cols=visibleCollections().filter(c=>!searchText||c.title.toLowerCase().includes(searchText.toLowerCase()));
   const favIds=state.favorites[selectedKid.id]||[],favEpisodes=allEpisodes().filter(e=>favIds.includes(e.id));
-  const recent=state.history.filter(h=>h.kidId===selectedKid.id).slice(0,10).map(h=>allEpisodes().find(e=>e.id===h.episodeId)).filter(Boolean);
-  return `<button class="btn ghost bigBack" data-act="chips">← Zurück zu den Chips</button>
-  <div class="sectionHead"><div><h2>Was möchtest du heute schauen?</h2><p>${esc(selectedKid.name)} · ${allowance.type==="two"?"🎟️🎟️ Zwei Folgen":"🎟️ Eine Folge"}</p></div><button class="btn mint" data-act="random">🎲 Überrasch mich</button></div>
-  <div class="kidNav"><button class="${mediaMode==="series"?"active":""}" data-media="series"><span>📺</span>Serien</button><button class="${mediaMode==="movie"?"active":""}" data-media="movie"><span>🎬</span>Filme</button><button class="${mediaMode==="all"?"active":""}" data-media="all"><span>⭐</span>Alles</button></div>
-  <div class="searchbar"><input id="searchInput" value="${esc(searchText)}" placeholder="Serien oder Folgen suchen"><button class="btn" data-act="search">Suchen</button><button class="btn ghost" data-act="clearSearch">Leeren</button></div>
-  <div class="categoryRow">${cats.map(c=>`<button class="pill ${activeCategory===c?"active":""}" data-category="${esc(c)}">${esc(c)}</button>`).join("")}</div>
-  ${recent.length?shelfEpisodes("Zuletzt geschaut",recent):""}${favEpisodes.length?shelfEpisodes("Favoriten",favEpisodes):""}
-  <div class="shelf"><div class="shelfTitle"><h3>Für dich ausgewählt</h3></div>${cols.length?`<div class="carousel">${cols.map(collectionCard).join("")}</div>`:'<div class="empty">Hier ist noch nichts eingetragen. Mama oder Papa können im Elternbereich Inhalte hinzufügen.</div>'}</div>`
+  return `<button class="btn ghost bigBack" data-act="chips" aria-label="Zurück">←</button>
+  <div class="sectionHead"><div><h2>${selectedKid.avatar} ${allowance.type==="two"?"🎟️🎟️":"🎟️"}</h2></div><button class="btn mint" data-act="random" aria-label="Überraschung">🎲</button></div>
+  <div class="kidNav">
+    <button class="${mediaMode==="series"?"active":""}" data-media="series" aria-label="Serien"><span>📺</span></button>
+    <button class="${mediaMode==="movie"?"active":""}" data-media="movie" aria-label="Filme"><span>🎬</span></button>
+    <button class="${mediaMode==="all"?"active":""}" data-media="all" aria-label="Alles"><span>⭐</span></button>
+  </div>
+  ${favEpisodes.length?shelfEpisodes("⭐",favEpisodes):""}
+  <div class="shelf">${cols.length?`<div class="carousel">${cols.map(collectionCard).join("")}</div>`:'<div class="empty">🐻</div>'}</div>`
 }
-function collectionCard(c){const cover=c.coverId||c.episodes[0]?.youtubeId||"";return `<article class="collectionCard"><img class="cover" src="${cover?thumb(cover):""}" alt=""><span class="badge">${esc(c.category)}</span><div class="cardBody"><h3>${esc(c.title)}</h3><p>${c.episodes.length} Folge${c.episodes.length===1?"":"n"}</p></div><button class="overlayBtn" data-collection="${c.id}"></button></article>`}
+function shortTitle(t){return t.replace("Blaze und die Monster-Maschinen","Blaze").replace("Gabbys Puppenhaus","Gabby").replace("Hot Wheels Let\'s Race","Hot Wheels").replace("Die Tautropfentagebücher","Tautropfen").replace("Unsere Filme","Filme")} function collectionCard(c){const cover=c.coverId||c.episodes[0]?.youtubeId||"";return `<article class="collectionCard"><img class="cover" src="${cover?thumb(cover):""}" alt=""><div class="cardBody"><h3>${esc(shortTitle(c.title))}</h3></div><button class="overlayBtn" data-collection="${c.id}"></button></article>`}
 function shelfEpisodes(title,eps){return `<div class="shelf"><div class="shelfTitle"><h3>${esc(title)}</h3></div><div class="carousel">${eps.map(episodeCard).join("")}</div></div>`}
-function episodeCard(e){const fav=(state.favorites[selectedKid.id]||[]).includes(e.id);return `<article class="episodeCard"><img class="cover" src="${thumb(e.youtubeId)}" alt=""><button class="btn icon favoriteBtn ${fav?"active":""}" data-fav="${e.id}">${fav?"★":"☆"}</button><div class="cardBody"><h4>${esc(e.title)}</h4><p>${esc(e.collectionTitle||"")}</p></div><button class="overlayBtn" data-play="${e.id}"></button></article>`}
+function episodeCard(e){const fav=(state.favorites[selectedKid.id]||[]).includes(e.id);return `<article class="episodeCard"><img class="cover" src="${thumb(e.youtubeId)}" alt=""><button class="btn icon favoriteBtn ${fav?"active":""}" data-fav="${e.id}">${fav?"★":"☆"}</button><div class="cardBody"><h4>${esc(e.title)}</h4></div><button class="overlayBtn" data-play="${e.id}"></button></article>`}
 function collectionView(){
   const c=visibleCollections().find(x=>x.id===activeCollection);if(!c){screen="library";return libraryView()}
   const eps=c.episodes.map(e=>Object.assign({collectionTitle:c.title},e));
-  return `<div class="breadcrumb"><button class="btn ghost" data-act="library">← Mediathek</button><span class="muted">${esc(c.category)}</span></div>${hero(c.title,`${c.episodes.length} Folge${c.episodes.length===1?"":"n"}`,"🎬")}
-  <div class="sectionHead"><div><h2>Folgen</h2><p>Tippen und anschauen</p></div></div><div class="episodeGrid">${eps.length?eps.map(episodeCard).join(""):'<div class="empty">Noch keine Folgen vorhanden.</div>'}</div>`
+  return `<div class="breadcrumb"><button class="btn ghost bigBack" data-act="library" aria-label="Zurück">←</button></div>
+  <div class="sectionHead"><div><h2>${esc(shortTitle(c.title))}</h2></div></div>
+  <div class="episodeGrid">${eps.length?eps.map(episodeCard).join(""):'<div class="empty">🐻</div>'}</div>`
 }
 function modalView(){
   if(modal==="login")return `<div class="modalBack"><div class="modal"><div class="modalHead"><h2>Elternbereich</h2><button class="btn ghost" data-act="closeModal">Schließen</button></div><div class="form" style="margin-top:18px"><label>PIN<input id="loginPin" type="password" inputmode="numeric" autofocus></label></div><div class="actions"><button class="btn primary" data-act="unlock">Öffnen</button></div></div></div>`;
@@ -353,7 +422,7 @@ function stopTimer(){clearInterval(timerInterval);timerInterval=null}
 function expireAllowance(){stopTimer();const c=chipState(selectedKid.id);if(allowance.type==="bonus")c.bonus=Math.max(0,c.bonus-1);else c.used[allowance.type]=true;save();player=null;allowance=null;screen="chips";render();showToast("🎟️ Ticket ist aufgebraucht")}
 window.addEventListener("error",e=>{console.error(e.error||e.message);showToast("Bärflix-Fehler – bitte Seite neu laden")});
 render();
-if("serviceWorker"in navigator&&location.protocol.startsWith("http"))window.addEventListener("load",()=>navigator.serviceWorker.register("./service-worker.js?v=3").catch(console.warn));
+if("serviceWorker"in navigator&&location.protocol.startsWith("http"))window.addEventListener("load",()=>navigator.serviceWorker.register("./service-worker.js?v=6").catch(console.warn));
 })();
 </script>
 </body>
