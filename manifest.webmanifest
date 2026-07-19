@@ -1,13 +1,13 @@
 {
-  "name": "Bärflix 7.0 Treehouse",
+  "name": "Bärflix 8.0 Abenteuerwelten",
   "short_name": "Bärflix",
-  "description": "Private Familien-Streaming-App mit Profilen, Serien, Favoriten und Chip-System.",
+  "description": "Private kinderfreundliche Familien-Mediathek für Ludwig und Fabian",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
   "orientation": "any",
   "background_color": "#8fd9f7",
-  "theme_color": "#8ed6f5",
+  "theme_color": "#55bde9",
   "icons": [
     {
       "src": "./icons/icon.svg",
