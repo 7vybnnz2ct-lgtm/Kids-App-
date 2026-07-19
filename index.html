@@ -48,7 +48,8 @@ img{max-width:100%}
 .categoryRow{display:flex;gap:10px;overflow:auto;padding:2px 0 9px;scrollbar-width:none}.categoryRow::-webkit-scrollbar{display:none}.pill{border:0;border-radius:999px;padding:10px 16px;background:var(--panel3);color:var(--text);white-space:nowrap}.pill.active{background:var(--gold);color:#2a211a;font-weight:900}
 .searchbar{display:flex;gap:10px;flex-wrap:wrap;margin:16px 0}.searchbar input{flex:1;min-width:220px}
 .shelf{margin-top:24px}.shelfTitle{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:12px}.shelfTitle h3{margin:0;font-size:23px}
-.carousel{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(230px,26vw);gap:15px;overflow-x:auto;padding:2px 3px 15px;scroll-snap-type:x proximity;scrollbar-width:none}.carousel::-webkit-scrollbar{display:none}
+.carousel{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:18px;padding:2px 3px 15px}.carousel::-webkit-scrollbar{display:none}
+.kidNav{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:18px 0}.kidNav button{min-height:92px;border:0;border-radius:22px;background:var(--panel2);color:var(--text);font-weight:950;font-size:20px;display:grid;place-items:center;gap:4px}.kidNav button.active{background:var(--gold);color:#291f19}.kidNav span{font-size:34px;display:block}.adminLayout{display:grid;grid-template-columns:245px minmax(0,1fr);gap:18px;align-items:start}.adminSide{display:grid;gap:8px;position:sticky;top:0}.adminSide button{text-align:left;padding:14px 15px;font-size:16px}.adminContent{min-width:0}.bigBack{min-height:58px;font-size:18px}.movieEmpty{border:2px dashed var(--line);padding:34px;border-radius:24px;text-align:center;color:var(--muted)}
 .collectionCard,.episodeCard{position:relative;background:var(--panel);border-radius:20px;overflow:hidden;box-shadow:var(--shadow);scroll-snap-align:start;transition:.18s}.collectionCard:hover,.episodeCard:hover{transform:translateY(-3px)}
 .cover{width:100%;aspect-ratio:16/9;object-fit:cover;display:block;background:#0a0a0a}.cardBody{padding:14px}.cardBody h3,.cardBody h4{margin:0}.cardBody p{margin:6px 0 0;color:var(--muted);font-size:13px}.overlayBtn{position:absolute;inset:0;border:0;background:transparent}
 .badge{position:absolute;left:12px;top:12px;padding:7px 10px;border-radius:999px;background:rgba(28,21,18,.88);font-weight:900;font-size:12px}.favoriteBtn{position:absolute;right:12px;top:12px;z-index:3}.favoriteBtn.active{background:var(--gold);color:#2b211a}
@@ -67,10 +68,12 @@ input,select,textarea{width:100%;border:1px solid var(--line);border-radius:13px
 .toast{position:fixed;left:50%;bottom:calc(22px + env(safe-area-inset-bottom));transform:translateX(-50%);z-index:200;background:#fff;color:#251b16;padding:12px 16px;border-radius:14px;box-shadow:var(--shadow)}
 .setup{max-width:760px;margin:8vh auto 0}.dots{display:flex;gap:8px;margin-bottom:18px}.dot{height:7px;flex:1;border-radius:999px;background:var(--panel3)}.dot.active{background:var(--gold)}
 .updateBanner{margin-bottom:14px;padding:13px 15px;border-radius:16px;background:var(--blue);color:#122126;font-weight:850;display:flex;justify-content:space-between;align-items:center;gap:12px}
+@media(max-width:900px){.adminLayout{grid-template-columns:1fr}.adminSide{position:static;grid-template-columns:repeat(2,minmax(0,1fr))}.adminSide button{text-align:center}.kidNav{grid-template-columns:repeat(3,minmax(0,1fr))}}
 @media(max-width:760px){
   .app{padding-left:12px;padding-right:12px}.brand h1{font-size:29px}.logo{font-size:39px}.hero{padding:22px}.heroEmoji{font-size:62px}
-  .formGrid{grid-template-columns:1fr}.carousel{grid-auto-columns:78vw}.episodeGrid{grid-template-columns:repeat(2,minmax(0,1fr));gap:11px}.cardBody{padding:11px}.cardBody h3,.cardBody h4{font-size:15px}
+  .formGrid{grid-template-columns:1fr}.carousel{grid-template-columns:repeat(2,minmax(0,1fr));gap:11px}.episodeGrid{grid-template-columns:repeat(2,minmax(0,1fr));gap:11px}.cardBody{padding:11px}.cardBody h3,.cardBody h4{font-size:15px}
 }
+@media(max-width:470px){.carousel,.episodeGrid{grid-template-columns:1fr 1fr}.kidNav button{font-size:15px;min-height:82px}.kidNav span{font-size:29px}.adminSide{grid-template-columns:1fr 1fr}}
 </style>
 </head>
 <body>
@@ -78,8 +81,8 @@ input,select,textarea{width:100%;border:1px solid var(--line);border-radius:13px
 <div id="app"></div>
 <script>
 (()=>{"use strict";
-const APP_VERSION="4.0.0";
-const KEY="baerflix.complete.v4";
+const APP_VERSION="5.0.0";
+const KEY="baerflix.complete.v5";
 const $=(s,r=document)=>r.querySelector(s);
 const esc=s=>String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[m]));
 const uid=()=>crypto.randomUUID?crypto.randomUUID():Date.now()+"-"+Math.random();
@@ -91,7 +94,7 @@ const defaults={
   settings:{pinHash:"",pinSalt:"",categories:["Für Ludwig","Serien","Fahrzeuge","Wissen & Technik","Tiere","Musik","Gute Nacht"],updateVersion:APP_VERSION},
   kids:[],collections:[{"id":"col-blaze","title":"Blaze und die Monster-Maschinen","category":"Fahrzeuge","coverId":"97AiQrxpca4","audience":["ludwig"],"episodes":[{"id":"blaze-1","youtubeId":"uPjeikJPATo","title":"Blaze stellt die Naschzeug-Diebin","order":0},{"id":"blaze-2","youtubeId":"ePqD4j_3nj4","title":"Die Recycling-Kraft","order":1},{"id":"blaze-3","youtubeId":"uJZvFsPkcOI","title":"Die Power-Reifen","order":2},{"id":"blaze-4","youtubeId":"t3Ma4ucdK7s","title":"Ninja Blaze","order":3},{"id":"blaze-5","youtubeId":"AvbtG7JhFH4","title":"Blazes fantastische Geschichten","order":4},{"id":"blaze-6","youtubeId":"iIAKh5vyyW4","title":"Blazes Weltraumabenteuer","order":5},{"id":"blaze-7","youtubeId":"ilzaZ7znCL8","title":"Das Dschungelhorn","order":6},{"id":"blaze-8","youtubeId":"bh32Yc5xMuI","title":"Die Backkatastrophe","order":7}]},{"id":"col-tautropfen","title":"Die Tautropfentagebücher","category":"Serien","coverId":"3W8JYqi-HgQ","audience":["ludwig"],"episodes":[{"id":"tau-1","youtubeId":"B23wSpAmWHo","title":"Das große Seifenblasenproblem","order":0},{"id":"tau-2","youtubeId":"TRdg_1vcqs4","title":"Briefabenteuer – eine besondere Lieferung","order":1},{"id":"tau-3","youtubeId":"C5zu9tRD7N8","title":"Sparschweinchenprobleme","order":2},{"id":"tau-4","youtubeId":"caVwaWK-xLo","title":"Die Feen bringen einen Hund zum Park","order":3},{"id":"tau-5","youtubeId":"Qme-9f8eXq8","title":"Die Tautropfen retten Harpers Fußballspiel","order":4},{"id":"tau-6","youtubeId":"77xV2Bn_cbU","title":"Ein Handy benutzen, das größer ist als du","order":5},{"id":"tau-7","youtubeId":"Z0pN9zu7qag","title":"Unternehmen Zahnfee","order":6},{"id":"tau-8","youtubeId":"4Saw_KbPcvg","title":"Die Feen entdecken eine neue Art zu fliegen","order":7}]},{"id":"col-fixies","title":"Die Fixies","category":"Wissen & Technik","coverId":"9bjc7fvP_wI","audience":["ludwig"],"episodes":[{"id":"fix-1","youtubeId":"9bjc7fvP_wI","title":"Das Fixiefon","order":0},{"id":"fix-2","youtubeId":"wQu_9ZJ7yVw","title":"Tom Thomas entdeckt die Kraft der Sonne","order":1},{"id":"fix-3","youtubeId":"uV89n_-DtY0","title":"Tom wird in einem Computervirus gefangen","order":2},{"id":"fix-4","youtubeId":"keBiLP_v-WY","title":"Unsichtbare Tinte","order":3},{"id":"fix-5","youtubeId":"U8qKFDUOH3U","title":"Seine Hose ist kaputt","order":4},{"id":"fix-6","youtubeId":"lR_U1KID1K4","title":"Die schwebenden Zauberbücher","order":5},{"id":"fix-7","youtubeId":"0qJ9rHL9aIQ","title":"Staffel 3 – komplette Sammlung","order":6},{"id":"fix-8","youtubeId":"HWJnkFYdi5c","title":"Staffel 2 – komplette Sammlung","order":7}]},{"id":"col-hotwheels","title":"Hot Wheels Let's Race","category":"Fahrzeuge","coverId":"KNYlz2JZgkw","audience":["ludwig"],"episodes":[{"id":"hot-1","youtubeId":"uCsARCroJiI","title":"Außer Kontrolle","order":0},{"id":"hot-2","youtubeId":"3VpwxF2dn9I","title":"Drachen-Showdown: Gemeinsam zum Sieg","order":1},{"id":"hot-3","youtubeId":"wcoJPLIAks0","title":"Ultimative Garagenübernahme","order":2},{"id":"hot-4","youtubeId":"8H3ex9pOlD8","title":"Ballonrettung: Coops große Rettung","order":3},{"id":"hot-5","youtubeId":"KNYlz2JZgkw","title":"Das Rennen um 500 Pizzen","order":4},{"id":"hot-6","youtubeId":"rbzK9OI3oAA","title":"Titelsong zum Mitsingen","order":5}]}],favorites:{},history:[],chips:{},usage:[]
 };
-let state=load(),screen=state.kids.length?"profiles":"setup",selectedKid=null,allowance=null,activeCategory="Alle",activeCollection=null,searchText="",modal=null,player=null,toastTimer=null;
+let state=load(),screen=state.kids.length?"profiles":"setup",selectedKid=null,allowance=null,activeCategory="Alle",mediaMode="series",activeCollection=null,searchText="",modal=null,player=null,toastTimer=null;
 window.adminTab="overview";
 
 function migrate(raw){
@@ -100,7 +103,7 @@ function migrate(raw){
   s.settings.categories=s.settings.categories||raw?.categories||defaults.settings.categories;
   s.kids=(s.kids||[]).map(k=>Object.assign({weekdayMinutes:12,weekendMinutes:15,color:"#f3c85b",avatar:"🐻"},k));
   s.collections=(s.collections&&s.collections.length?s.collections:structuredClone(defaults.collections));
-  s.collections=s.collections.map(c=>Object.assign({audience:["all"]},c));
+  s.collections=s.collections.map(c=>Object.assign({audience:["all"],type:"series"},c));
   s.favorites=s.favorites||{};
   s.history=s.history||[];
   s.chips=s.chips||{};
@@ -108,7 +111,27 @@ function migrate(raw){
   s.version=APP_VERSION;
   return s
 }
-function load(){try{return migrate(JSON.parse(localStorage.getItem(KEY)||"{}"))}catch{return structuredClone(defaults)}}
+
+function enrichStarterContent(s){
+ const byId=id=>s.collections.find(c=>c.id===id);
+ const add=(cid,items)=>{const c=byId(cid);if(!c)return;const known=new Set(c.episodes.map(e=>e.id));items.forEach(e=>{if(!known.has(e.id))c.episodes.push(e)})};
+ add("col-blaze",[
+ {id:"blaze-9",youtubeId:"lbSyfB_eyNU",title:"Der Mega-Matsch-Roboter",order:8},{id:"blaze-10",youtubeId:"ttxEpUDI1SU",title:"Das Hundert-Meilen-Rennen",order:9},{id:"blaze-11",youtubeId:"Zolg8p50i18",title:"Superheld Blaze rettet Axle City",order:10},{id:"blaze-12",youtubeId:"37dWI78L4Ew",title:"Blazes Tierverwandlungen",order:11},{id:"blaze-13",youtubeId:"2gEC0OpMdvc",title:"Rennen, Verwandlungen und Rettungen",order:12},{id:"blaze-14",youtubeId:"rdWItZMHJjU",title:"Rennen-und-Rettungen-Marathon",order:13}
+ ]);
+ add("col-fixies",[
+ {id:"fix-9",youtubeId:"uWRDgmMgzvY",title:"Komplette Staffel 3",order:8},{id:"fix-10",youtubeId:"Sup1YZ8m44s",title:"Ganze Folgen nach der Schule",order:9},{id:"fix-11",youtubeId:"wivW3-LH2S8",title:"Neue Fixies-Sammlung",order:10}
+ ]);
+ add("col-hotwheels",[
+ {id:"hot-7",youtubeId:"VCjrhPtMaPY",title:"Die ultimative Hai-Flucht-Challenge",order:6},{id:"hot-8",youtubeId:"0oJriw3EsJ4",title:"Mac und Mega-Wrex arbeiten zusammen",order:7},{id:"hot-9",youtubeId:"fDuKpGTOvlI",title:"Coops ultimativer Rivalen-Showdown",order:8},{id:"hot-10",youtubeId:"4ULnZEmxv6o",title:"Wer überquert zuerst die Ziellinie?",order:9},{id:"hot-11",youtubeId:"N499VQ6WOo0",title:"Abenteuer in Hot Wheels City",order:10},{id:"hot-12",youtubeId:"-Giq5alRDHU",title:"Das goldene Lenkrad",order:11}
+ ]);
+ if(!byId("col-gabby"))s.collections.push({id:"col-gabby",title:"Gabbys Puppenhaus",category:"Serien",type:"series",coverId:"a0UnOYfcSHQ",audience:["ludwig","fabian"],episodes:[
+ {id:"gabby-1",youtubeId:"a0UnOYfcSHQ",title:"Kätzchen-Kita-Ohr – ganze Folge",order:0},{id:"gabby-2",youtubeId:"fVnN402TTYQ",title:"Kätzchen-Bären-Teeparty",order:1},{id:"gabby-3",youtubeId:"tjiMoNeryu4",title:"Gabby-Märchen",order:2},{id:"gabby-4",youtubeId:"4Fr894eTTgs",title:"Rettungsmission im Weltall",order:3},{id:"gabby-5",youtubeId:"sWMnxmD3Hcc",title:"Gabbys beste Abenteuer im Freien",order:4},{id:"gabby-6",youtubeId:"3pOdKJvYoWE",title:"Die besten Meerjungfrauen-Momente",order:5},{id:"gabby-7",youtubeId:"AWr7D9ZfIE0",title:"Wie man einen schlechten Tag rettet",order:6},{id:"gabby-8",youtubeId:"2NG9_TbBsDA",title:"Gute-Nacht-Snacks mit den Gabbykatzen",order:7},{id:"gabby-9",youtubeId:"xCK6PAplh4o",title:"Unterwasser-Versteckspiel",order:8},{id:"gabby-10",youtubeId:"cB4ku3KKDL8",title:"Ratkatz' erster Tag im Schnee",order:9},{id:"gabby-11",youtubeId:"yIfqhF-LDPY",title:"Zeit fürs Bett",order:10},{id:"gabby-12",youtubeId:"Jax5nV0ow70",title:"Schnee im Puppenhaus",order:11}
+ ]});
+ if(!byId("col-oona"))s.collections.push({id:"col-oona",title:"Oona & Baba",category:"Serien",type:"series",coverId:"Yn7BuYeTfWQ",audience:["ludwig","fabian"],episodes:[],note:"Für Oona & Baba wurden keine verlässlich deutschsprachigen, offiziell einbettbaren Folgen gefunden. Im Elternbereich können später deutsche Links ergänzt werden."});
+ if(!byId("col-filme"))s.collections.push({id:"col-filme",title:"Unsere Filme",category:"Filme",type:"movie",coverId:"",audience:["ludwig","fabian"],episodes:[],note:"Hier können Eltern legal verfügbare vollständige Filme oder eigene freigegebene Links hinterlegen."});
+ return s;
+}
+function load(){try{return enrichStarterContent(migrate(JSON.parse(localStorage.getItem(KEY)||"{}")))}catch{return enrichStarterContent(structuredClone(defaults))}}
 function save(){localStorage.setItem(KEY,JSON.stringify(state))}
 function mutate(fn){fn(state);save();render()}
 function categories(){return state.settings.categories}
@@ -167,7 +190,7 @@ function chipsView(){
   <div class="chipGrid">${chip("one1","⭐ Eine Folge",m,"one")}${chip("one2","⭐ Eine Folge",m,"one")}${chip("two","⭐⭐ Zwei Folgen",m*2,"two")}
   <button class="chip bonus" data-chip="bonus" data-min="${m}" ${c.bonus<1?"disabled":""}><b>🌈 Bonuschip</b><span>${c.bonus} verfügbar · ${m} Minuten</span></button></div>`
 }
-function visibleCollections(){return state.collections.filter(c=>!selectedKid||!c.audience||c.audience.includes("all")||c.audience.includes(selectedKid.id))}
+function visibleCollections(){return state.collections.filter(c=>(!selectedKid||!c.audience||c.audience.includes("all")||c.audience.includes(selectedKid.id))&&(mediaMode==="all"||c.type===mediaMode))}
 function allEpisodes(){return visibleCollections().flatMap(c=>c.episodes.map(e=>Object.assign({collectionId:c.id,collectionTitle:c.title,category:c.category},e)))}
 function filteredEpisodes(){
   const q=searchText.trim().toLowerCase();
@@ -177,12 +200,13 @@ function libraryView(){
   const cats=["Alle",...categories()],cols=visibleCollections().filter(c=>(activeCategory==="Alle"||c.category===activeCategory)&&(!searchText||c.title.toLowerCase().includes(searchText.toLowerCase())||c.episodes.some(e=>e.title.toLowerCase().includes(searchText.toLowerCase()))));
   const favIds=state.favorites[selectedKid.id]||[],favEpisodes=allEpisodes().filter(e=>favIds.includes(e.id));
   const recent=state.history.filter(h=>h.kidId===selectedKid.id).slice(0,10).map(h=>allEpisodes().find(e=>e.id===h.episodeId)).filter(Boolean);
-  return `<button class="btn ghost" data-act="chips">← Chips</button>
+  return `<button class="btn ghost bigBack" data-act="chips">← Zurück zu den Chips</button>
   <div class="sectionHead"><div><h2>Was möchtest du heute schauen?</h2><p>${esc(selectedKid.name)} · ${fmt(allowance.remaining)} verfügbar</p></div><button class="btn mint" data-act="random">🎲 Überrasch mich</button></div>
+  <div class="kidNav"><button class="${mediaMode==="series"?"active":""}" data-media="series"><span>📺</span>Serien</button><button class="${mediaMode==="movie"?"active":""}" data-media="movie"><span>🎬</span>Filme</button><button class="${mediaMode==="all"?"active":""}" data-media="all"><span>⭐</span>Alles</button></div>
   <div class="searchbar"><input id="searchInput" value="${esc(searchText)}" placeholder="Serien oder Folgen suchen"><button class="btn" data-act="search">Suchen</button><button class="btn ghost" data-act="clearSearch">Leeren</button></div>
   <div class="categoryRow">${cats.map(c=>`<button class="pill ${activeCategory===c?"active":""}" data-category="${esc(c)}">${esc(c)}</button>`).join("")}</div>
   ${recent.length?shelfEpisodes("Zuletzt geschaut",recent):""}${favEpisodes.length?shelfEpisodes("Favoriten",favEpisodes):""}
-  <div class="shelf"><div class="shelfTitle"><h3>Für dich ausgewählt</h3></div>${cols.length?`<div class="carousel">${cols.map(collectionCard).join("")}</div>`:'<div class="empty">Für dieses Profil sind noch keine Serien freigegeben. Im Elternbereich kannst du Inhalte hinzufügen oder sichtbar machen.</div>'}</div>`
+  <div class="shelf"><div class="shelfTitle"><h3>Für dich ausgewählt</h3></div>${cols.length?`<div class="carousel">${cols.map(collectionCard).join("")}</div>`:'<div class="empty">Hier ist noch nichts eingetragen. Mama oder Papa können im Elternbereich Inhalte hinzufügen.</div>'}</div>`
 }
 function collectionCard(c){const cover=c.coverId||c.episodes[0]?.youtubeId||"";return `<article class="collectionCard"><img class="cover" src="${cover?thumb(cover):""}" alt=""><span class="badge">${esc(c.category)}</span><div class="cardBody"><h3>${esc(c.title)}</h3><p>${c.episodes.length} Folge${c.episodes.length===1?"":"n"}</p></div><button class="overlayBtn" data-collection="${c.id}"></button></article>`}
 function shelfEpisodes(title,eps){return `<div class="shelf"><div class="shelfTitle"><h3>${esc(title)}</h3></div><div class="carousel">${eps.map(episodeCard).join("")}</div></div>`}
@@ -198,13 +222,13 @@ function modalView(){
   if(modal==="admin")return adminView();return ""
 }
 function adminView(){
-  const tab=window.adminTab||"overview",tabs=[["overview","Übersicht"],["collections","Serien"],["episodes","Folgen"],["kids","Kinder"],["categories","Kategorien"],["settings","Einstellungen"],["stats","Statistik"],["backup","Backup"]];
+  const tab=window.adminTab||"overview",tabs=[["overview","🏠 Übersicht"],["collections","📚 Serien & Filme"],["episodes","▶️ Folgen & Videos"],["kids","Kinder"],["categories","Kategorien"],["settings","Einstellungen"],["stats","Statistik"],["backup","Backup"]];
   return `<div class="modalBack"><div class="modal"><div class="modalHead"><div><h2>Elternbereich</h2><div class="muted">Alle Daten bleiben auf diesem Gerät.</div></div><button class="btn ghost" data-act="closeModal">Schließen</button></div>
-  <div class="adminTabs">${tabs.map(t=>`<button class="btn ${tab===t[0]?"primary":""}" data-tab="${t[0]}">${t[1]}</button>`).join("")}</div>${adminTabView(tab)}</div></div>`
+  <div class="adminLayout"><nav class="adminSide">${tabs.map(t=>`<button class="btn ${tab===t[0]?"primary":""}" data-tab="${t[0]}">${t[1]}</button>`).join("")}</nav><section class="adminContent">${adminTabView(tab)}</section></div></div></div>`
 }
 function adminTabView(tab){
   if(tab==="overview")return `<div class="adminGrid"><section class="panel"><h3>📺 Inhalte</h3><p class="muted">${state.collections.length} Sammlungen · ${allEpisodes().length} Folgen</p></section><section class="panel"><h3>👧 Profile</h3><p class="muted">${state.kids.length} Kinderprofile</p></section><section class="panel"><h3>⏱️ Nutzung</h3><p class="muted">${Math.round(state.usage.reduce((a,u)=>a+u.seconds,0)/60)} Minuten insgesamt</p></section></div>`;
-  if(tab==="collections")return `<div class="formGrid"><label>Titel<input id="colTitle" placeholder="z. B. Feuerwehr Sam"></label><label>Kategorie<select id="colCat">${categories().map(c=>`<option>${esc(c)}</option>`).join("")}</select></label><label>Optionales Vorschaubild: YouTube-Link<input id="colCover" placeholder="leer = erste Folge"></label><label>Sichtbar für<select id="colAudience"><option value="all">Alle Kinder</option>${state.kids.map(k=>`<option value="${k.id}">${esc(k.name)}</option>`).join("")}</select></label></div><div class="actions"><button class="btn primary" data-act="addCollection">Sammlung anlegen</button></div>
+  if(tab==="collections")return `<div class="formGrid"><label>Titel<input id="colTitle" placeholder="z. B. Feuerwehr Sam"></label><label>Kategorie<select id="colCat">${categories().map(c=>`<option>${esc(c)}</option>`).join("")}</select></label><label>Optionales Vorschaubild: YouTube-Link<input id="colCover" placeholder="leer = erste Folge"></label><label>Art<select id="colType"><option value="series">Serie</option><option value="movie">Film</option></select></label><label>Sichtbar für<select id="colAudience"><option value="all">Alle Kinder</option>${state.kids.map(k=>`<option value="${k.id}">${esc(k.name)}</option>`).join("")}</select></label></div><div class="actions"><button class="btn primary" data-act="addCollection">Sammlung anlegen</button></div>
   <div class="list" style="margin-top:18px">${state.collections.map(c=>`<div class="listItem"><span><b>${esc(c.title)}</b><br><small>${esc(c.category)} · ${c.episodes.length} Folgen</small></span><span><button class="btn" data-editcol="${c.id}">Bearbeiten</button> <button class="btn danger" data-delcol="${c.id}">Löschen</button></span></div>`).join("")||'<div class="empty">Noch keine Sammlungen.</div>'}</div>`;
   if(tab==="episodes")return `<div class="form"><label>Sammlung<select id="epCollection">${state.collections.map(c=>`<option value="${c.id}">${esc(c.title)}</option>`).join("")}</select></label><label>YouTube-Link<input id="epUrl" placeholder="https://youtu.be/..."></label><label>Titel<input id="epTitle" placeholder="Titel der Folge"></label></div><div class="actions"><button class="btn primary" data-act="fetchTitle">Titel automatisch holen</button><button class="btn mint" data-act="addEpisode">Folge hinzufügen</button></div>
   <div class="list" style="margin-top:18px">${state.collections.flatMap(c=>c.episodes.map(e=>`<div class="listItem"><span><b>${esc(e.title)}</b><br><small>${esc(c.title)}</small></span><span><button class="btn" data-editep="${e.id}">Bearbeiten</button> <button class="btn danger" data-delep="${e.id}">Löschen</button></span></div>`)).join("")||'<div class="empty">Noch keine Folgen.</div>'}</div>`;
@@ -225,6 +249,7 @@ function bind(){
   document.querySelectorAll("[data-kid]").forEach(b=>b.onclick=()=>{selectedKid=state.kids.find(k=>k.id===b.dataset.kid);screen="chips";render()});
   document.querySelectorAll("[data-chip]").forEach(b=>b.onclick=()=>{allowance={type:b.dataset.chip,remaining:Number(b.dataset.min)*60};screen="library";render()});
   document.querySelectorAll("[data-category]").forEach(b=>b.onclick=()=>{activeCategory=b.dataset.category;render()});
+  document.querySelectorAll("[data-media]").forEach(b=>b.onclick=()=>{mediaMode=b.dataset.media;activeCategory="Alle";render()});
   document.querySelectorAll("[data-collection]").forEach(b=>b.onclick=()=>{activeCollection=b.dataset.collection;screen="collection";render()});
   document.querySelectorAll("[data-play]").forEach(b=>b.onclick=()=>startPlayer(b.dataset.play));
   document.querySelectorAll("[data-fav]").forEach(b=>b.onclick=e=>{e.stopPropagation();toggleFav(b.dataset.fav)});
@@ -251,7 +276,7 @@ async function act(a){
   if(a==="search"){searchText=$("#searchInput").value;render()}
   if(a==="clearSearch"){searchText="";render()}
   if(a==="random"){const eps=filteredEpisodes();if(!eps.length)return showToast("Keine passenden Folgen vorhanden");startPlayer(eps[Math.floor(Math.random()*eps.length)].id)}
-  if(a==="addCollection"){const title=$("#colTitle").value.trim(),category=$("#colCat").value,coverId=getVideoId($("#colCover").value);if(!title)return showToast("Bitte Titel eingeben");const audience=$("#colAudience")?.value||"all";mutate(s=>s.collections.push({id:uid(),title,category,coverId,audience:[audience],episodes:[]}));showToast("Sammlung angelegt")}
+  if(a==="addCollection"){const title=$("#colTitle").value.trim(),category=$("#colCat").value,coverId=getVideoId($("#colCover").value);if(!title)return showToast("Bitte Titel eingeben");const audience=$("#colAudience")?.value||"all",type=$("#colType")?.value||"series";mutate(s=>s.collections.push({id:uid(),title,category,coverId,audience:[audience],type,episodes:[]}));showToast("Sammlung angelegt")}
   if(a==="fetchTitle")fetchTitle()
   if(a==="addEpisode")addEpisode()
   if(a==="addKid"){const name=$("#kidName").value.trim();if(!name)return showToast("Bitte Namen eingeben");mutate(s=>s.kids.push({id:uid(),name,avatar:$("#kidAvatar").value,color:$("#kidColor").value,weekdayMinutes:+$("#kidWeekday").value||12,weekendMinutes:+$("#kidWeekend").value||15}));showToast("Profil hinzugefügt")}
