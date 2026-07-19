@@ -1,13 +1,13 @@
 {
-  "name": "Bärflix",
+  "name": "Bärflix 7.0 Treehouse",
   "short_name": "Bärflix",
   "description": "Private Familien-Streaming-App mit Profilen, Serien, Favoriten und Chip-System.",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
   "orientation": "any",
-  "background_color": "#c9efff",
-  "theme_color": "#bfe9ff",
+  "background_color": "#8fd9f7",
+  "theme_color": "#8ed6f5",
   "icons": [
     {
       "src": "./icons/icon.svg",
